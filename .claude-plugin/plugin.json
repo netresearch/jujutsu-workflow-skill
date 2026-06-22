@@ -1,0 +1,14 @@
+{
+  "name": "jj-agent-workflow",
+  "version": "0.1.0",
+  "description": "Agent-safe version control with Jujutsu (jj): jj as the local change layer, Git as the canonical remote/PR/CI/audit interface",
+  "repository": "https://github.com/netresearch/jj-agent-workflow-skill",
+  "license": "(MIT AND CC-BY-SA-4.0)",
+  "author": {
+    "name": "Netresearch DTT GmbH",
+    "url": "https://www.netresearch.de"
+  },
+  "skills": [
+    "./skills/jj-agent-workflow"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  // docs/PRD.md is an imported, verbatim working document (a living PRD), not
+  // authored skill content — it is not linted as such.
+  "ignores": [
+    "docs/PRD.md"
+  ],
+  "config": {
+    "MD010": false,
+    "MD012": false,
+    "MD013": false,
+    "MD022": false,
+    "MD024": false,
+    "MD026": false,
+    "MD029": false,
+    "MD031": false,
+    "MD032": false,
+    "MD033": false,
+    "MD034": false,
+    "MD036": false,
+    "MD040": false,
+    "MD041": false,
+    "MD058": false,
+    "MD060": false
+  }
+}
