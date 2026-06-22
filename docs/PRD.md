@@ -1,7 +1,104 @@
-> **Status:** Working document (living PRD). This is the source-of-truth product
-> specification the repository scaffolds toward. The first version was authored
-> outside the repo and is preserved here verbatim below. Update this document as
-> the skill evolves.
+> **Status:** Working document (living PRD). **Revision 2** below is the
+> authoritative spec; **Revision 1** (the original, preserved verbatim) follows
+> for history. R2 was produced after (a) verifying every command hands-on against
+> `jj 0.42.0`, and (b) a competitive analysis of ~20 existing jj agent skills.
+
+---
+
+# Revision 2 — verified & competitively grounded (2026-06-23)
+
+This revision supersedes Revision 1 where they differ. R1's intent is unchanged
+(jj = local change layer, Git = canonical remote/PR/CI/audit interface); R2 fixes
+command errors, restructures the package, and adds the requirements that make this
+skill demonstrably **superior** to both git-workflow skills and existing jj skills.
+
+## R2.1 Verified command corrections (jj 0.42.0)
+
+All commands were run hands-on in real colocated repos. Corrections to R1:
+
+- **`jj rebase` destination:** R1 FR-007 used `jj rebase -o main`. Verified: in
+  v0.42 the destination is `--onto`/`-o` (documented) **and** `-d`/`--destination`
+  still works. Both are valid; the skill uses `jj rebase -d <branch>` (long-standing,
+  still supported) for readability.
+- **`jj git push` new bookmarks:** R1 FR-006/SR-002 implied `--allow-new`. Verified:
+  **`--allow-new` does not exist in v0.42.** `jj git push --bookmark <new>` pushes a
+  new bookmark directly; `jj git push --change @` auto-creates `push-<changeid>`.
+- **Colocation detection:** prefer `jj git colocation status` (official) over heuristics;
+  `jj git root` exists and returns the `.git` dir.
+- **Conflicts are first-class (proven):** a conflicting `jj rebase` *completes* and
+  records the conflict in the commit (`jj st` → `(conflict)`, `jj resolve --list`),
+  instead of aborting into git's detached-HEAD/aborted-rebase limbo. `jj undo` reverses it.
+
+## R2.2 Agentic-safety requirements (NEW — the consensus floor)
+
+The #1 failure mode of jj-in-an-agent is **hanging on interactivity**. The skill MUST:
+
+- **FR-011 Non-interactive by default:** always `--no-pager` on output commands and
+  set `ui.paginate = never`; always `-m` for messages; **never** invoke editor/TUI
+  forms (`jj describe|commit|squash` without `-m`, bare `jj split`, `jj squash -i`,
+  `jj resolve`, `jj diffedit`). Provide non-interactive substitutes (split by path,
+  edit conflict markers directly).
+- **FR-012 Correct the snapshot myth:** jj snapshots the working copy only when a jj
+  command runs — **not** on every file write. Ship a hook recipe (SessionStart /
+  PreCompact / pre-tool `jj status`) so the safety net is real, not assumed.
+
+## R2.3 Superiority requirements (NEW — what existing skills miss)
+
+- **FR-013 Mitigate the three documented jj-for-agents failure modes** (from the
+  field report `2389-research/agentjj`, which adopted then *removed* jj):
+  1. **Commit absorption** — multi-step work collapsing into one fat commit. Mitigation:
+     mandate `jj new` between logical units; `jj split <path>` to recover.
+  2. **Parallel bundling** — a single working copy grabbing two subagents' edits.
+     Mitigation: one `jj workspace` per concurrent agent.
+  3. **Colocated git/jj desync** — never run mutating raw `git` in a colocated repo.
+- **FR-014 Anti-hype + honest scope:** no unverifiable performance claims
+  ("23× faster", "87% auto-resolve", "quantum-resistant"). Every benefit is paired
+  with a mechanism or citation. Include a **"When NOT to use jj"** section.
+- **FR-015 Proven, not asserted:** ship tested `scripts/` and a smoke eval; pin the
+  tested jj version (0.42.0) and note graceful degradation across the fast-moving CLI.
+- **FR-016 Worktree → workspace redirect:** in a jj repo, redirect `git worktree`
+  (and worktree-based agent isolation) to `jj workspace`.
+
+## R2.4 Revised package structure (supersedes §12)
+
+Progressive disclosure (slim SKILL.md + on-demand references), matching the best
+existing skills (cryfs, joshuadavidthomas) and exceeding them on agent-safety:
+
+```text
+skills/jj-agent-workflow/
+├── SKILL.md                         # slim, trigger-gated core (≤500 words)
+├── references/
+│   ├── command-map.md               # git→jj translation + verified command/revset map
+│   ├── agent-safety.md              # no-pager, non-interactive, what-hangs, snapshot myth, hooks, signing
+│   ├── recovery-playbook.md         # op log/undo/restore, conflicts, divergent, stale working copy
+│   ├── pr-handoff.md                # bookmark→push→PR (gh/glab), CI, cleanup, review-comment strategies
+│   ├── git-interop.md               # colocated detection, exclusive-mode, read-only git, traps
+│   ├── parallel-agents.md           # workspaces; absorption & parallel-bundling mitigations
+│   └── why-jj-for-agents.md         # evidence-backed thesis + "when NOT to use jj"
+└── scripts/
+    ├── detect_jj_state.sh           # git-only / jj-only / colocated detection (tested)
+    └── verify_handoff.sh            # final verification gate (tested)
+```
+
+`agents/openai.yaml` is intentionally omitted (no Netresearch skill repo ships one;
+the OpenAI description derives from SKILL.md).
+
+## R2.5 Competitive positioning (evidence)
+
+Verified June 2026 across ~20 jj agent skills. Negative examples: `ruvnet/claude-flow`
+& `ruvnet/ruflo` (`agentic-jujutsu`) teach a proprietary JS wrapper with zero real jj
+commands and hype metrics; `proffesor-for-testing/agentic-qe` ships a content-free stub
+(its own team scored the proposal 23% in a "brutal-honesty" review). Strong references:
+`danverbraganza/jujutsu-skill` (agent-safety framing), `cryfs/cryfs` (progressive
+disclosure), `knoopx/pi` (machine-enforced guardrails, non-interactive hunk tool),
+`joshuadavidthomas/agent-skills` (structure), `pkrusche/jj-parallel-agents-skill` (the
+only one shipping evals), `carbon-language/carbon-lang` (production detect-and-gate).
+This skill adopts the consensus floor and adds R2.2/R2.3 — which, taken together, no
+single existing skill provides.
+
+---
+
+# Revision 1 (original, preserved verbatim)
 
 # PRD: `jj-agent-workflow` Skill
 

@@ -1,7 +1,8 @@
 ---
 name: jj-agent-workflow
-description: "Use when a coding agent works in a repository where Jujutsu (jj) is available — jj commands, patch stacks, speculative edits, splitting changes, operation-log recovery (jj undo / jj op restore), git/GitHub/GitLab PR handoff, or review-comment updates. Uses jj as the local change-management layer while keeping Git as the canonical remote, PR, CI, and audit interface, and replaces fragile git reset/checkout/stash/rebase recovery with safer, reversible jj operations."
+description: "Use when a coding agent works in a repository where Jujutsu (jj) is available (a `.jj/` directory) — running jj commands, making speculative edits, splitting changes, recovering with the operation log (jj undo / jj op restore), handing off a PR to Git/GitHub/GitLab, updating a PR after review, or coordinating parallel agents. Uses jj as the local change-management layer while keeping Git as the canonical remote, PR, CI, and audit interface. Also use to avoid jj's agent footguns (pager/editor hangs, commit absorption, colocated git/jj desync) or to replace fragile git reset/checkout/stash/rebase recovery with reversible jj operations."
 license: "(MIT AND CC-BY-SA-4.0). See LICENSE-MIT and LICENSE-CC-BY-SA-4.0"
+compatibility: "Verified against jj 0.42.0. jj's CLI moves fast; re-check flags with `jj <cmd> --help` on other versions."
 metadata:
   author: Netresearch DTT GmbH
   version: "0.1.0"
@@ -10,54 +11,59 @@ metadata:
 
 # jj Agent Workflow
 
-Use `jj` as the local change-management layer and Git as the external collaboration layer. `jj` is the agent's scratch-and-history engine; Git stays the contract with the outside world — remote, PR, CI, review, release, and audit.
+`jj` (Jujutsu) is the agent's local change-management layer; **Git stays the canonical remote, PR, CI, and audit interface.** Mutate locally with `jj`; verify with read-only Git.
 
-## Core rules
+## 1. Detect & gate first
 
-1. Detect repository state before any version-control mutation.
-2. Prefer `jj` for local mutations; use Git mostly for read-only verification.
-3. Never push directly to protected or default branches.
-4. Never rewrite public history unless the user or project explicitly allows it.
-5. Use operation-log recovery (`jj op log`, `jj undo`, `jj op restore`) before destructive Git recovery.
-6. Do not rely on Git's staging area — `jj` ignores it.
-7. Split unrelated changes into separate commits before handoff when possible.
-8. Never claim success without showing version-control state and command output.
+Run `${CLAUDE_SKILL_DIR}/scripts/detect_jj_state.sh`, or check manually:
 
-## Detect state first
+- `.jj/` present → jj repo: use `jj`, never **mutating** raw `git`.
+- `.jj/` **and** `.git/` → colocated: mutate with `jj`, read with git, never touch the git index/staging.
+- only `.git/` → plain Git repo: do not introduce `jj` unless asked.
 
-```bash
-git rev-parse --show-toplevel 2>/dev/null || true
-jj root 2>/dev/null || true
-git status --short --branch 2>/dev/null || true
-jj status 2>/dev/null || true
-```
+See [references/git-interop.md](references/git-interop.md).
 
-If neither Git nor `jj` is present, do not invent a workflow. If Git exists but `jj` does not, use Git unless explicitly asked to initialize `jj`. In a colocated repo, mutate with `jj` and verify with read-only Git.
+## 2. Agent-safety rules (non-negotiable)
 
-## Edit loop
+- Always `--no-pager` on output commands; set `jj config set --user ui.paginate never`.
+- Always `-m`. **Never** run editor/TUI forms — bare `jj describe|commit|squash`, `jj split` (interactive), `jj squash -i`, `jj resolve`, `jj diffedit` — they hang agents.
+- `jj` snapshots the working copy only when a jj command runs, **not** on every file write.
+
+See [references/agent-safety.md](references/agent-safety.md).
+
+## 3. Edit loop
 
 ```bash
-jj status
-jj log --limit 10
-# edit files — jj auto-snapshots the working copy
-jj diff
+jj --no-pager status
+# edit files (snapshotted on the next jj command)
+jj --no-pager diff
 jj describe -m "<project-conventional message>"
+jj new -m "<next unit>"     # one change per logical unit — avoids one fat commit
 ```
 
-## Handoff
+Split a mixed change non-interactively: `jj split <path> -m "<msg>"`. See [references/command-map.md](references/command-map.md).
 
-Update from the remote with `jj git fetch` instead of `git pull`, then rebase your change onto the project's default branch. Create a Git-visible bookmark and push it for the PR; never push to a protected or default branch. Defer to project governance: branch protection, CODEOWNERS, commit conventions, signed commits, CI gates, and merge strategy. Disclose any force-push or history rewrite explicitly.
+## 4. Recover (reversible)
 
-## Final verification gate
+`jj --no-pager op log` → `jj undo` (last op) or `jj op restore <id>`. Conflicts are first-class: `jj status` flags them; resolve by editing markers, then verify. See [references/recovery-playbook.md](references/recovery-playbook.md).
 
-Before claiming completion, run and report:
+## 5. Hand off via Git
 
 ```bash
-jj status
-jj log --limit 10
-jj diff --stat
-git status --short --branch
-git log --oneline -n 5
+jj git fetch
+jj rebase -d <default-branch>
+jj bookmark create <branch> -r @-
+jj git push --bookmark <branch>      # new bookmarks push directly (no --allow-new in 0.42)
 ```
 
-Report the exact commands and their results. If a check was skipped or unavailable, say so. Never say "done", "tested", or "ready to merge" without observed output, and surface any unresolved conflict.
+Never push to a protected/default branch; never rewrite public history unless allowed. Open the PR with `gh`/`glab`. See [references/pr-handoff.md](references/pr-handoff.md).
+
+## 6. Parallel agents
+
+One `jj workspace` per concurrent agent — never share a working copy. See [references/parallel-agents.md](references/parallel-agents.md).
+
+## 7. Verify before "done"
+
+Run `${CLAUDE_SKILL_DIR}/scripts/verify_handoff.sh`, or report `jj --no-pager status`, `jj --no-pager log --limit 10`, `jj --no-pager diff --stat`, `git status --short --branch`. Report exact commands and output; never claim "done/tested/ready" without it; disclose force-pushes, recoveries, and conflicts.
+
+**Why jj beats git for agents** (and when NOT to use it): [references/why-jj-for-agents.md](references/why-jj-for-agents.md).
