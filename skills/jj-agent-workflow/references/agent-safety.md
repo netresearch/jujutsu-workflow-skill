@@ -29,7 +29,6 @@ These open `$EDITOR` or a TUI and hang an agent. Each has a non-interactive form
 | `jj split` (interactive diff editor) | `jj split <paths> -m "msg"` |
 | `jj diffedit` | edit files directly, then `jj diff` |
 | `jj resolve` (merge tool) | edit the conflict markers in the file, then verify |
-| `jj rebase` opening an editor | always pass an explicit `-d`/`-s`/`-r` |
 
 Good vs bad:
 

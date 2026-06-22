@@ -14,7 +14,7 @@ another version, confirm a flag with `jj <cmd> --help`.
 | amend | `git commit --amend` | edit files, then `jj describe -m` / `jj squash` |
 | new branch of work | `git checkout -b x` | `jj new -m "msg"` (+ a bookmark only at handoff) |
 | branch (for remote) | `git branch x` | `jj bookmark create x -r @-` |
-| switch | `git switch x` | `jj edit <rev>` (avoid in colocated; see git-interop.md) |
+| switch | `git switch x` | `jj edit <rev>` (don't edit a change another workspace holds; see parallel-agents.md) |
 | stash | `git stash` | not needed — just `jj new`; the work is already a commit |
 | update from remote | `git pull` | `jj git fetch` then `jj rebase -d <branch>` |
 | push a PR branch | `git push -u origin x` | `jj git push --bookmark x` |
@@ -42,7 +42,7 @@ jj commit -m "msg"                          # finalize @ and open a fresh empty 
 jj split <paths> -m "msg"                   # non-interactive: paths → first commit
 jj squash [--from R] [--into R] [-m msg]    # move changes between commits
 jj rebase -d <dest> [-s R | -b R | -r R]    # -d and -o/--onto both work in 0.42
-jj edit <rev>                               # make <rev> the working copy (see traps)
+jj edit <rev>                               # make <rev> the working copy (not one another workspace holds — see parallel-agents.md)
 jj abandon <rev>                            # drop a change
 ```
 
@@ -69,7 +69,7 @@ Target commits precisely instead of guessing hashes. Test a revset with
 | `@` / `@-` | working copy / its parent |
 | `mine()` | changes you authored |
 | `trunk()` | the trunk/main bookmark |
-| `description(substring:"text")` | match on description. **Default `description("text")` is EXACT in 0.42** — use `substring:` to match a fragment |
+| `description(substring:"text")` | match on description. **Bare `description("text")` is a `glob:` pattern in 0.42** and won't match a full message (descriptions store a trailing `\n`) — use `substring:` for a fragment, or `exact:"text\n"` for an exact match |
 | `conflicts()` | revisions with conflicts |
 | `x::y` / `::x` | ancestry ranges; `x \| y` is union (NOT comma) |
 
