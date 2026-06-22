@@ -14,7 +14,7 @@ another version, confirm a flag with `jj <cmd> --help`.
 | amend | `git commit --amend` | edit files, then `jj describe -m` / `jj squash` |
 | new branch of work | `git checkout -b x` | `jj new -m "msg"` (+ a bookmark only at handoff) |
 | branch (for remote) | `git branch x` | `jj bookmark create x -r @-` |
-| switch | `git switch x` | `jj edit <rev>` (don't edit a change another workspace holds; see parallel-agents.md) |
+| switch | `git switch x` | `jj edit <rev>` (don't edit a change held by another workspace; see parallel-agents.md) |
 | stash | `git stash` | not needed — just `jj new`; the work is already a commit |
 | update from remote | `git pull` | `jj git fetch` then `jj rebase -d <branch>` |
 | push a PR branch | `git push -u origin x` | `jj git push --bookmark x` |
@@ -42,7 +42,7 @@ jj commit -m "msg"                          # finalize @ and open a fresh empty 
 jj split <paths> -m "msg"                   # non-interactive: paths → first commit
 jj squash [--from R] [--into R] [-m msg]    # move changes between commits
 jj rebase -d <dest> [-s R | -b R | -r R]    # -d and -o/--onto both work in 0.42
-jj edit <rev>                               # make <rev> the working copy (not one another workspace holds — see parallel-agents.md)
+jj edit <rev>                               # make <rev> the working copy (not one held by another workspace — see parallel-agents.md)
 jj abandon <rev>                            # drop a change
 ```
 

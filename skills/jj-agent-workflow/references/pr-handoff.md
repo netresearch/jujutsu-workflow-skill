@@ -63,7 +63,7 @@ jj git push --bookmark <bookmark>
 ### Amend in place (clean history; needs force-push permission)
 
 ```bash
-jj edit <bookmark>          # safe for a single agent; never edit a change another workspace holds (see parallel-agents.md)
+jj edit <bookmark>          # safe for a single agent; never edit a change held by another workspace (see parallel-agents.md)
 # edit files
 jj --no-pager diff
 jj bookmark move <bookmark> --to @-
