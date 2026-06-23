@@ -53,7 +53,7 @@ otherwise un-pushable), and keep `.jj/` out of git:
 ```bash
 jj config set --repo user.name  "Some One"          # --repo: scope to this repo
 jj config set --repo user.email "someone@example.com"
-echo '.jj/' >> "$(git rev-parse --git-common-dir)/info/exclude"   # local exclude
+echo '.jj/' >> "$(git rev-parse --git-path info/exclude)"   # local exclude
 ```
 
 ## The two rules for colocated repos
