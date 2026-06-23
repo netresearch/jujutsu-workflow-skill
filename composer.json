@@ -1,5 +1,5 @@
 {
-    "name": "netresearch/jj-agent-workflow-skill",
+    "name": "netresearch/jujutsu-workflow-skill",
     "description": "Agent-safe version-control workflows using Jujutsu (jj) with Git-backed repositories: jj for local change management, Git as the canonical remote/PR/CI/audit interface.",
     "type": "ai-agent-skill",
     "license": "(MIT AND CC-BY-SA-4.0)",
@@ -14,10 +14,10 @@
         "netresearch/composer-agent-skill-plugin": "*"
     },
     "extra": {
-        "ai-agent-skill": "skills/jj-agent-workflow/SKILL.md"
+        "ai-agent-skill": "skills/jujutsu-workflow/SKILL.md"
     },
     "support": {
-        "issues": "https://github.com/netresearch/jj-agent-workflow-skill/issues",
-        "source": "https://github.com/netresearch/jj-agent-workflow-skill"
+        "issues": "https://github.com/netresearch/jujutsu-workflow-skill/issues",
+        "source": "https://github.com/netresearch/jujutsu-workflow-skill"
     }
 }

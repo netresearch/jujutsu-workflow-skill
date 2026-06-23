@@ -1,17 +1,17 @@
 {
-  "name": "@netresearch/jj-agent-workflow-skill",
+  "name": "@netresearch/jujutsu-workflow-skill",
   "version": "0.0.0-source",
   "private": true,
   "description": "Agent-safe version-control workflows using Jujutsu (jj) with Git-backed repositories.",
   "license": "(MIT AND CC-BY-SA-4.0)",
   "author": "Netresearch DTT GmbH (https://www.netresearch.de/)",
-  "homepage": "https://github.com/netresearch/jj-agent-workflow-skill",
+  "homepage": "https://github.com/netresearch/jujutsu-workflow-skill",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/netresearch/jj-agent-workflow-skill.git"
+    "url": "git+https://github.com/netresearch/jujutsu-workflow-skill.git"
   },
   "bugs": {
-    "url": "https://github.com/netresearch/jj-agent-workflow-skill/issues"
+    "url": "https://github.com/netresearch/jujutsu-workflow-skill/issues"
   },
   "keywords": [
     "ai-agent-skill",
@@ -23,9 +23,9 @@
     "anthropic",
     "claude-code"
   ],
-  "aiAgentSkill": "skills/jj-agent-workflow/SKILL.md",
+  "aiAgentSkill": "skills/jujutsu-workflow/SKILL.md",
   "files": [
-    "skills/jj-agent-workflow/",
+    "skills/jujutsu-workflow/",
     ".claude-plugin/",
     "AGENTS.md",
     "LICENSE-MIT",

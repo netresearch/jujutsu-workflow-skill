@@ -1,4 +1,4 @@
-# jj Agent Workflow
+# Jujutsu Workflow
 
 ## What this skill solves
 
@@ -17,7 +17,7 @@ For speculative, iterative, multi-step agent work, jj is **superior to pure Git*
 - **Non-interactive history surgery** — `jj split <path> -m` carves a commit in two without an editor; git needs interactive `rebase -i`.
 - **Whole-repo time travel** — `jj op restore` rewinds many operations (commits + bookmarks) in one command; git has no single-command equivalent.
 
-This skill **claims** the advantage here, **proves** it in [the evals](tests/superiority_evals.sh), and **enforces** it in [`SKILL.md`](skills/jj-agent-workflow/SKILL.md) (jj-first whenever a `.jj/` repo is present). The full, evidence-backed thesis — including an honest **"when NOT to use jj"** — is in [why-jj-for-agents.md](skills/jj-agent-workflow/references/why-jj-for-agents.md).
+This skill **claims** the advantage here, **proves** it in [the evals](tests/superiority_evals.sh), and **enforces** it in [`SKILL.md`](skills/jujutsu-workflow/SKILL.md) (jj-first whenever a `.jj/` repo is present). The full, evidence-backed thesis — including an honest **"when NOT to use jj"** — is in [why-jj-for-agents.md](skills/jujutsu-workflow/references/why-jj-for-agents.md).
 
 ## Use when
 
@@ -67,23 +67,23 @@ Add the [Netresearch marketplace](https://github.com/netresearch/claude-code-mar
 Install with any [Agent Skills](https://agentskills.io)-compatible agent:
 
 ```bash
-npx skills add https://github.com/netresearch/jj-agent-workflow-skill --skill jj-agent-workflow
+npx skills add https://github.com/netresearch/jujutsu-workflow-skill --skill jujutsu-workflow
 ```
 
 ### Download release
 
-Download the [latest release](https://github.com/netresearch/jj-agent-workflow-skill/releases/latest) and extract to your agent's skills directory.
+Download the [latest release](https://github.com/netresearch/jujutsu-workflow-skill/releases/latest) and extract to your agent's skills directory.
 
 ### Git clone
 
 ```bash
-git clone https://github.com/netresearch/jj-agent-workflow-skill.git
+git clone https://github.com/netresearch/jujutsu-workflow-skill.git
 ```
 
 ### Composer (PHP projects)
 
 ```bash
-composer require netresearch/jj-agent-workflow-skill
+composer require netresearch/jujutsu-workflow-skill
 ```
 
 Requires [netresearch/composer-agent-skill-plugin](https://github.com/netresearch/composer-agent-skill-plugin).
@@ -93,7 +93,7 @@ Requires [netresearch/composer-agent-skill-plugin](https://github.com/netresearc
 ```bash
 npm install --save-dev \
   @netresearch/agent-skill-coordinator \
-  github:netresearch/jj-agent-workflow-skill
+  github:netresearch/jujutsu-workflow-skill
 ```
 
 Requires [@netresearch/agent-skill-coordinator](https://github.com/netresearch/node-agent-skill-coordinator), which discovers the skill in `node_modules` and registers it in `AGENTS.md` via a `postinstall` hook.
