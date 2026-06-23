@@ -30,6 +30,32 @@ jj config set --user ui.paginate never
 
 Nothing about the Git side changes; `git log`/`git status` keep working.
 
+### Inside a git worktree (colocation refuses)
+
+A colocated `jj git init` **fails inside a git worktree** (where `.git` is a
+file, not a directory) with `Cannot create a colocated jj repo inside a Git
+worktree`. This is common in bare-repo + worktree layouts. Two options:
+
+- **Preferred** — run colocated init in the *main* (non-worktree) checkout, or
+  use `jj workspace add` for additional working copies.
+- **Fallback** — initialize **non-colocated** against the backing repo:
+
+  ```bash
+  jj git init --git-repo=/path/to/repo.git   # e.g. ../.bare in a worktree layout
+  ```
+
+  Trade-off: non-colocated means raw `git` no longer sees jj's working-copy
+  commits without `jj git export` — you lose the "read with git" convenience.
+
+After either path, jj has **no user identity by default**; set one (commits are
+otherwise un-pushable), and keep `.jj/` out of git:
+
+```bash
+jj config set --repo user.name  "Some One"          # --repo: scope to this repo
+jj config set --repo user.email "someone@example.com"
+echo '.jj/' >> "$(git rev-parse --git-common-dir)/info/exclude"   # local exclude
+```
+
 ## The two rules for colocated repos
 
 1. **Mutate with jj, read with git.** Safe git in a colocated repo: `git status`,
