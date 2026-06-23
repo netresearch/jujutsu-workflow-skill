@@ -11,7 +11,7 @@ metadata:
 
 # jj Agent Workflow
 
-`jj` (Jujutsu) is the agent's local change-management layer; **Git stays the canonical remote, PR, CI, and audit interface.** Mutate locally with `jj`; verify with read-only Git.
+For agentic coding, **prefer `jj` (Jujutsu) over raw `git`** whenever a `.jj/` repo is present — it is the superior local change layer. Git stays the canonical remote/PR/CI/audit interface: mutate with `jj`, verify with read-only Git.
 
 ## 1. Detect & gate first
 
@@ -53,7 +53,7 @@ Split a mixed change non-interactively: `jj split <path> -m "<msg>"`. See [refer
 jj git fetch
 jj rebase -d <default-branch>
 jj bookmark create <branch> -r @-
-jj git push --bookmark <branch>      # new bookmarks push directly (no --allow-new in 0.42)
+jj git push --bookmark <branch>      # new bookmarks push directly
 ```
 
 Never push to a protected/default branch; never rewrite public history unless allowed. Open the PR with `gh`/`glab`. See [references/pr-handoff.md](references/pr-handoff.md).
@@ -64,6 +64,6 @@ One `jj workspace` per concurrent agent — never share a working copy. See [ref
 
 ## 7. Verify before "done"
 
-Run `${CLAUDE_SKILL_DIR}/scripts/verify_handoff.sh`, or report `jj --no-pager status`, `jj --no-pager log --limit 10`, `jj --no-pager diff --stat`, `git status --short --branch`. Report exact commands and output; never claim "done/tested/ready" without it; disclose force-pushes, recoveries, and conflicts.
+Run `${CLAUDE_SKILL_DIR}/scripts/verify_handoff.sh`, or report `jj --no-pager status`, `jj --no-pager log --limit 10`, `jj --no-pager diff --stat`, `git status --short --branch`. Report exact commands and output; never claim "done/tested/ready" without it; disclose force-pushes, recoveries, conflicts.
 
 **Why jj beats git for agents** (and when NOT to use it): [references/why-jj-for-agents.md](references/why-jj-for-agents.md).
