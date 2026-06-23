@@ -1,4 +1,4 @@
-# Architecture — jj-agent-workflow-skill
+# Architecture — jujutsu-workflow-skill
 
 ## Overview
 
@@ -9,31 +9,31 @@ enforces that jj is superior to pure Git for agentic coding.
 
 ## Components
 
-### Skill definition ([`skills/jj-agent-workflow/SKILL.md`](../skills/jj-agent-workflow/SKILL.md))
+### Skill definition ([`skills/jujutsu-workflow/SKILL.md`](../skills/jujutsu-workflow/SKILL.md))
 
 The slim (≤500-word), trigger-gated entry point loaded by agent frameworks. It
 mandates jj-first behaviour when a `.jj/` repo is present, the agent-safety rules
 (no pager, non-interactive forms, snapshot-on-command), the edit/recover/handoff
 loop, and a verification gate. It links to the references for depth.
 
-### Reference docs ([`skills/jj-agent-workflow/references/`](../skills/jj-agent-workflow/references/))
+### Reference docs ([`skills/jujutsu-workflow/references/`](../skills/jujutsu-workflow/references/))
 
 Progressive-disclosure detail, loaded on demand:
 
-- **[command-map.md](../skills/jj-agent-workflow/references/command-map.md)** — git→jj translation plus the verified command and revset map.
-- **[agent-safety.md](../skills/jj-agent-workflow/references/agent-safety.md)** — pager/editor hangs, the snapshot myth, the hook recipe, signing.
-- **[git-interop.md](../skills/jj-agent-workflow/references/git-interop.md)** — colocation detection, exclusive-mode rules, worktree→workspace.
-- **[recovery-playbook.md](../skills/jj-agent-workflow/references/recovery-playbook.md)** — operation log, undo/restore, first-class conflicts, divergent changes.
-- **[pr-handoff.md](../skills/jj-agent-workflow/references/pr-handoff.md)** — bookmark→push→PR (gh/glab), review-update strategies, the gate.
-- **[parallel-agents.md](../skills/jj-agent-workflow/references/parallel-agents.md)** — workspaces and the three documented jj-for-agents failure-mode mitigations.
-- **[why-jj-for-agents.md](../skills/jj-agent-workflow/references/why-jj-for-agents.md)** — the evidence-backed superiority thesis and an honest "when NOT to use jj".
+- **[command-map.md](../skills/jujutsu-workflow/references/command-map.md)** — git→jj translation plus the verified command and revset map.
+- **[agent-safety.md](../skills/jujutsu-workflow/references/agent-safety.md)** — pager/editor hangs, the snapshot myth, the hook recipe, signing.
+- **[git-interop.md](../skills/jujutsu-workflow/references/git-interop.md)** — colocation detection, exclusive-mode rules, worktree→workspace.
+- **[recovery-playbook.md](../skills/jujutsu-workflow/references/recovery-playbook.md)** — operation log, undo/restore, first-class conflicts, divergent changes.
+- **[pr-handoff.md](../skills/jujutsu-workflow/references/pr-handoff.md)** — bookmark→push→PR (gh/glab), review-update strategies, the gate.
+- **[parallel-agents.md](../skills/jujutsu-workflow/references/parallel-agents.md)** — workspaces and the three documented jj-for-agents failure-mode mitigations.
+- **[why-jj-for-agents.md](../skills/jujutsu-workflow/references/why-jj-for-agents.md)** — the evidence-backed superiority thesis and an honest "when NOT to use jj".
 
-### Scripts ([`skills/jj-agent-workflow/scripts/`](../skills/jj-agent-workflow/scripts/))
+### Scripts ([`skills/jujutsu-workflow/scripts/`](../skills/jujutsu-workflow/scripts/))
 
 Tested, shellcheck-clean helpers the skill invokes via `${CLAUDE_SKILL_DIR}`:
 
-- **[detect_jj_state.sh](../skills/jj-agent-workflow/scripts/detect_jj_state.sh)** — classifies the repo as `git-only` / `jj-only` / `colocated` / `none`.
-- **[verify_handoff.sh](../skills/jj-agent-workflow/scripts/verify_handoff.sh)** — the final handoff gate (conflicts, protected branch, bookmark presence).
+- **[detect_jj_state.sh](../skills/jujutsu-workflow/scripts/detect_jj_state.sh)** — classifies the repo as `git-only` / `jj-only` / `colocated` / `none`.
+- **[verify_handoff.sh](../skills/jujutsu-workflow/scripts/verify_handoff.sh)** — the final handoff gate (conflicts, protected branch, bookmark presence).
 
 ### Evals / proof ([`tests/`](../tests/))
 

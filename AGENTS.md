@@ -1,4 +1,4 @@
-# AGENTS.md — jj-agent-workflow-skill
+# AGENTS.md — jujutsu-workflow-skill
 
 Agent-safe version-control workflows using Jujutsu (`jj`) with Git-backed
 repositories. `jj` is the local change-management layer; Git stays the canonical
@@ -8,7 +8,7 @@ remote, PR, CI, and audit interface.
 
 ```
 .
-├── skills/jj-agent-workflow/
+├── skills/jujutsu-workflow/
 │   ├── SKILL.md                     # slim, trigger-gated core (≤500 words)
 │   ├── references/                  # progressive-disclosure docs (loaded on demand)
 │   │   ├── command-map.md           # git→jj translation + verified command/revset map
@@ -33,8 +33,8 @@ remote, PR, CI, and audit interface.
 
 ## Commands
 
-- `bash skills/jj-agent-workflow/scripts/detect_jj_state.sh [--json]` — report repo VCS state.
-- `bash skills/jj-agent-workflow/scripts/verify_handoff.sh [--require-bookmark]` — handoff gate.
+- `bash skills/jujutsu-workflow/scripts/detect_jj_state.sh [--json]` — report repo VCS state.
+- `bash skills/jujutsu-workflow/scripts/verify_handoff.sh [--require-bookmark]` — handoff gate.
 - `bash tests/smoke_test.sh` — end-to-end proof (requires `jj` on PATH; uses a temp dir).
 - `bash <skill-repo-skill>/skills/skill-repo/scripts/validate-skill.sh .` — validate repo structure.
 
@@ -57,5 +57,5 @@ remote, PR, CI, and audit interface.
 
 ## References
 
-- [SKILL.md](skills/jj-agent-workflow/SKILL.md) — skill runtime instructions and the 7 reference docs.
+- [SKILL.md](skills/jujutsu-workflow/SKILL.md) — skill runtime instructions and the 7 reference docs.
 - [docs/PRD.md](docs/PRD.md) — product requirements (Revision 2 is authoritative) and competitive analysis.

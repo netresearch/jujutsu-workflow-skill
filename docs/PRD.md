@@ -1,7 +1,12 @@
 > **Status:** Working document (living PRD). **Revision 2** below is the
-> authoritative spec; **Revision 1** (the original, preserved verbatim) follows
-> for history. R2 was produced after (a) verifying every command hands-on against
-> `jj 0.42.0`, and (b) a competitive analysis of ~20 existing jj agent skills.
+> authoritative spec; **Revision 1** (the original spec) follows for history. R2
+> was produced after (a) verifying every command hands-on against `jj 0.42.0`, and
+> (b) a competitive analysis of ~20 existing jj agent skills.
+>
+> **Rename note:** this skill was originally drafted and created as
+> `jj-agent-workflow` and renamed to **`jujutsu-workflow`** on 2026-06-23 (SEO:
+> "jujutsu" is the rankable proper noun and "agent" is redundant for a skill).
+> References below use the current name.
 
 ---
 
@@ -65,7 +70,7 @@ Progressive disclosure (slim SKILL.md + on-demand references), matching the best
 existing skills (cryfs, joshuadavidthomas) and exceeding them on agent-safety:
 
 ```text
-skills/jj-agent-workflow/
+skills/jujutsu-workflow/
 ├── SKILL.md                         # slim, trigger-gated core (≤500 words)
 ├── references/
 │   ├── command-map.md               # git→jj translation + verified command/revset map
@@ -100,11 +105,11 @@ single existing skill provides.
 
 # Revision 1 (original, preserved verbatim)
 
-# PRD: `jj-agent-workflow` Skill
+# PRD: `jujutsu-workflow` Skill
 
 ## 1. Product summary
 
-**Skill name:** `jj-agent-workflow`
+**Skill name:** `jujutsu-workflow`
 
 **Product type:** ChatGPT Skill for coding-agent version-control workflows.
 
@@ -236,7 +241,7 @@ Needs to:
 
 ## 7. Core product thesis
 
-`jj-agent-workflow` should optimize for this architecture:
+`jujutsu-workflow` should optimize for this architecture:
 
 ```text
 jj  = local speculative editing, patch shaping, undo, stack management
@@ -549,7 +554,7 @@ The skill must defer to existing repository governance:
 * “No direct push to main” rules.
 * Project-specific merge strategy.
 
-`jj-agent-workflow` must not replace Git governance. It should compose with a Git workflow skill or repository rules when present.
+`jujutsu-workflow` must not replace Git governance. It should compose with a Git workflow skill or repository rules when present.
 
 ---
 
@@ -639,7 +644,7 @@ Do not trigger for:
 ## 12. Proposed skill package structure
 
 ```text
-jj-agent-workflow/
+jujutsu-workflow/
 ├── SKILL.md
 ├── agents/
 │   └── openai.yaml
@@ -749,7 +754,7 @@ Purpose:
 
 ```yaml
 ---
-name: jj-agent-workflow
+name: jujutsu-workflow
 description: agent-safe version-control workflows using jujutsu (`jj`) with git-compatible repositories. use when working with coding agents, jujutsu, jj commands, patch stacks, speculative edits, operation-log recovery, git/github/gitlab handoff, review-comment updates, or replacing fragile git mutation workflows with safer jj workflows while preserving git as the canonical remote/pr/ci interface.
 ---
 ```
@@ -759,7 +764,7 @@ description: agent-safe version-control workflows using jujutsu (`jj`) with git-
 ## 14. Draft `SKILL.md` core instructions
 
 ````markdown
-# jj Agent Workflow
+# Jujutsu Workflow
 
 Use `jj` as the local agent change-management layer and Git as the external collaboration layer.
 

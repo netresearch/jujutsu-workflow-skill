@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# smoke_test.sh — end-to-end proof that the jj-agent-workflow skill's instructions
+# smoke_test.sh — end-to-end proof that the jujutsu-workflow skill's instructions
 # actually work against a real jj repo + Git remote. Asserts the behaviors the
 # SKILL.md and references claim.
 #
@@ -11,8 +11,8 @@ set -uo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
-DET="$ROOT/skills/jj-agent-workflow/scripts/detect_jj_state.sh"
-VH="$ROOT/skills/jj-agent-workflow/scripts/verify_handoff.sh"
+DET="$ROOT/skills/jujutsu-workflow/scripts/detect_jj_state.sh"
+VH="$ROOT/skills/jujutsu-workflow/scripts/verify_handoff.sh"
 
 if ! command -v jj >/dev/null 2>&1; then
   echo "SKIP: jj is not installed — install jj to run the smoke test."

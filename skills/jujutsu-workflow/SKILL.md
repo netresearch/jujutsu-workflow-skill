@@ -1,15 +1,15 @@
 ---
-name: jj-agent-workflow
+name: jujutsu-workflow
 description: "Use when a coding agent works in a repository where Jujutsu (jj) is available (a `.jj/` directory) — running jj commands, making speculative edits, splitting changes, recovering with the operation log (jj undo / jj op restore), handing off a PR to Git/GitHub/GitLab, updating a PR after review, or coordinating parallel agents. Uses jj as the local change-management layer while keeping Git as the canonical remote, PR, CI, and audit interface. Also use to avoid jj's agent footguns (pager/editor hangs, commit absorption, colocated git/jj desync) or to replace fragile git reset/checkout/stash/rebase recovery with reversible jj operations."
 license: "(MIT AND CC-BY-SA-4.0). See LICENSE-MIT and LICENSE-CC-BY-SA-4.0"
 compatibility: "Verified against jj 0.42.0. jj's CLI moves fast; re-check flags with `jj <cmd> --help` on other versions."
 metadata:
   author: Netresearch DTT GmbH
   version: "0.1.0"
-  repository: https://github.com/netresearch/jj-agent-workflow-skill
+  repository: https://github.com/netresearch/jujutsu-workflow-skill
 ---
 
-# jj Agent Workflow
+# Jujutsu Workflow
 
 For agentic coding, **prefer `jj` (Jujutsu) over raw `git`** whenever a `.jj/` repo is present — it is the superior local change layer. Git stays the canonical remote/PR/CI/audit interface: mutate with `jj`, verify with read-only Git.
 
