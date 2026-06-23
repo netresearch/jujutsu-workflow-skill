@@ -2,7 +2,7 @@
 
 ## What this skill solves
 
-Coding agents are unreliable Git operators: they fold unrelated edits into one commit, lose work to `git reset` / `checkout` / `stash` / bad rebases, leave unclear branch state, and claim "done" without showing version-control status. This skill teaches agents to use **Jujutsu (`jj`)** as the local change-management layer while keeping **Git** as the canonical collaboration, CI, PR, and audit interface.
+Coding agents are unreliable Git operators: they fold unrelated edits into one commit, lose work to `git reset` / `checkout` / `stash` / bad rebases, leave unclear branch state, and claim "done" without showing version-control status. This skill teaches agents to use **[Jujutsu (`jj`)](https://github.com/jj-vcs/jj)** — a Git-compatible VCS ([docs](https://docs.jj-vcs.dev/latest/)) — as the local change-management layer while keeping **Git** as the canonical collaboration, CI, PR, and audit interface.
 
 - Safer, reversible edits via the `jj` operation log and undo instead of destructive Git recovery.
 - Cleaner patches — small, reviewable changes with unrelated edits split before handoff.
@@ -35,7 +35,7 @@ This skill **claims** the advantage here, **proves** it in [the evals](tests/sup
 
 ## Context requirements
 
-- A Git-backed repository (colocated `jj`/Git preferred), with `jj` installed locally.
+- A Git-backed repository (colocated `jj`/Git preferred), with [`jj` installed](https://docs.jj-vcs.dev/latest/install-and-setup/) locally.
 - Project governance is respected: branch protection, CODEOWNERS, commit conventions, signed commits, CI gates.
 - External access: none beyond the Git remote (GitHub/GitLab) the project already uses.
 
