@@ -36,7 +36,10 @@ lose() {
   return 0
 }
 
-TMP="$(mktemp -d)"
+TMP="$(mktemp -d)" || {
+  echo "setup error: mktemp failed" >&2
+  exit 2
+}
 trap 'rm -rf "$TMP"' EXIT
 export JJ_CONFIG="$TMP/jjconfig.toml"
 cat >"$JJ_CONFIG" <<'EOF'
@@ -45,6 +48,7 @@ name = "Eval"
 email = "eval@example.com"
 [ui]
 paginate = "never"
+editor = "true"
 EOF
 gitc() {
   git -c user.name=Eval -c user.email=eval@example.com "$@"
@@ -61,33 +65,29 @@ echo "=========================================================="
 #   jj : any discard (jj abandon) is reversible via the operation log.
 # ---------------------------------------------------------------------------
 g="$TMP/s1g"
-mkdir -p "$g"
-(
-  cd "$g" || exit 2
-  gitc init -q
-  echo v1 >f.txt
-  gitc add f.txt
-  gitc commit -qm v1
-  echo v2 >f.txt # uncommitted edit
-  gitc checkout -q -- f.txt # agent "discards" it
-)
+mkdir -p "$g" || exit 2
+cd "$g" || exit 2
+gitc init -q
+echo v1 >f.txt
+gitc add f.txt
+gitc commit -qm v1
+echo v2 >f.txt           # uncommitted edit
+gitc checkout -q -- f.txt # agent "discards" it
 git_recovered_v2=no
-[[ "$(cat "$g/f.txt")" == "v2" ]] && git_recovered_v2=yes # it won't be
+[[ "$(cat f.txt)" == "v2" ]] && git_recovered_v2=yes # it won't be
 
 j="$TMP/s1j"
-mkdir -p "$j"
-(
-  cd "$j" || exit 2
-  jj git init >/dev/null 2>&1
-  jj new -m feature >/dev/null 2>&1
-  echo important >f.txt
-  jj st >/dev/null 2>&1 # snapshot
-  op="$(jj --no-pager op log --no-graph -T 'id.short() ++ "\n"' 2>/dev/null | sed -n 1p)"
-  jj abandon >/dev/null 2>&1 # agent "discards" the whole change
-  jj op restore "$op" >/dev/null 2>&1 # recover it
-)
+mkdir -p "$j" || exit 2
+cd "$j" || exit 2
+jj git init >/dev/null 2>&1
+jj new -m feature >/dev/null 2>&1
+echo important >f.txt
+jj st >/dev/null 2>&1 # snapshot
+op="$(jj --no-pager op log --no-graph -T 'id ++ "\n"' 2>/dev/null | sed -n 1p)"
+jj abandon >/dev/null 2>&1     # agent "discards" the whole change
+jj op restore "$op" >/dev/null 2>&1 # recover it
 jj_recovered=no
-[[ "$(cat "$j/f.txt" 2>/dev/null)" == "important" ]] && jj_recovered=yes
+[[ "$(cat f.txt 2>/dev/null)" == "important" ]] && jj_recovered=yes
 
 if [[ "$jj_recovered" == "yes" && "$git_recovered_v2" == "no" ]]; then
   win "S1 reversible discard: jj op restore recovered abandoned work; git could not recover the discarded uncommitted edit"
@@ -101,47 +101,42 @@ fi
 #   jj : rebase COMPLETES, conflict stored as data, working copy usable, undoable.
 # ---------------------------------------------------------------------------
 g="$TMP/s2g"
-mkdir -p "$g"
+mkdir -p "$g" || exit 2
+cd "$g" || exit 2
 git_interrupted=no
-(
-  cd "$g" || exit 2
-  gitc init -q
-  echo base >c.txt
-  gitc add c.txt
-  gitc commit -qm base
-  gitc checkout -q -b A
-  echo AAA >c.txt
-  gitc commit -qm A c.txt
-  gitc checkout -q -b B main 2>/dev/null || gitc checkout -q -b B master
-  echo BBB >c.txt
-  gitc commit -qm B c.txt
-  gitc rebase A >/dev/null 2>&1
-) || true
-{ [[ -d "$g/.git/rebase-merge" || -d "$g/.git/rebase-apply" ]]; } && git_interrupted=yes
-[[ "$git_interrupted" == yes ]] && (cd "$g" && gitc rebase --abort >/dev/null 2>&1 || true)
+gitc init -q
+echo base >c.txt
+gitc add c.txt
+gitc commit -qm base
+gitc checkout -q -b A
+echo AAA >c.txt
+gitc commit -qm A c.txt
+gitc checkout -q -b B main 2>/dev/null || gitc checkout -q -b B master
+echo BBB >c.txt
+gitc commit -qm B c.txt
+gitc rebase A >/dev/null 2>&1 || true
+{ [[ -d ".git/rebase-merge" || -d ".git/rebase-apply" ]]; } && git_interrupted=yes
+[[ "$git_interrupted" == yes ]] && gitc rebase --abort >/dev/null 2>&1
 
 j="$TMP/s2j"
-mkdir -p "$j"
+mkdir -p "$j" || exit 2
+cd "$j" || exit 2
 jj_completed=no
 jj_reversible=no
-(
-  cd "$j" || exit 2
-  jj git init >/dev/null 2>&1
-  echo base >c.txt
-  jj describe -m base >/dev/null 2>&1
-  base="$(jj --no-pager log --no-graph -r @ -T change_id 2>/dev/null)"
-  jj new "$base" -m A >/dev/null 2>&1
-  echo AAA >c.txt
-  a="$(jj --no-pager log --no-graph -r @ -T change_id 2>/dev/null)"
-  jj new "$base" -m B >/dev/null 2>&1
-  echo BBB >c.txt
-  jj rebase -s @ -d "$a" >/dev/null 2>&1 && echo COMPLETED >"$TMP/s2_rc"
-  jj --no-pager status 2>/dev/null | grep -qi 'unresolved conflicts' && echo CONFLICT >"$TMP/s2_cf"
-  jj undo >/dev/null 2>&1
-  jj --no-pager status 2>/dev/null | grep -qi 'unresolved conflicts' || echo CLEARED >"$TMP/s2_cl"
-)
-[[ -f "$TMP/s2_rc" && -f "$TMP/s2_cf" ]] && jj_completed=yes
-[[ -f "$TMP/s2_cl" ]] && jj_reversible=yes
+jj git init >/dev/null 2>&1
+echo base >c.txt
+jj describe -m base >/dev/null 2>&1
+base="$(jj --no-pager log --no-graph -r @ -T change_id 2>/dev/null)"
+jj new "$base" -m A >/dev/null 2>&1
+echo AAA >c.txt
+a="$(jj --no-pager log --no-graph -r @ -T change_id 2>/dev/null)"
+jj new "$base" -m B >/dev/null 2>&1
+echo BBB >c.txt
+if jj rebase -s @ -d "$a" >/dev/null 2>&1; then
+  jj --no-pager status 2>/dev/null | grep -qi 'unresolved conflicts' && jj_completed=yes
+fi
+jj undo >/dev/null 2>&1
+jj --no-pager status 2>/dev/null | grep -qi 'unresolved conflicts' || jj_reversible=yes
 
 if [[ "$jj_completed" == yes && "$jj_reversible" == yes && "$git_interrupted" == yes ]]; then
   win "S2 conflict handling: jj rebase completed with the conflict recorded (and jj undo reversed it); git rebase halted mid-operation"
@@ -155,19 +150,17 @@ fi
 #   jj : `jj split <path> -m` does it in ONE non-interactive command.
 # ---------------------------------------------------------------------------
 j="$TMP/s3j"
-mkdir -p "$j"
+mkdir -p "$j" || exit 2
+cd "$j" || exit 2
 jj_split=no
-(
-  cd "$j" || exit 2
-  jj git init >/dev/null 2>&1
-  echo a >a.txt
-  echo b >b.txt
-  jj describe -m "both files" >/dev/null 2>&1
-  jj split a.txt -m "just a" >/dev/null 2>&1
-)
+jj git init >/dev/null 2>&1
+echo a >a.txt
+echo b >b.txt
+jj describe -m "both files" >/dev/null 2>&1
+jj split a.txt -m "just a" >/dev/null 2>&1
 # proof: split produced TWO distinct described commits, and a.txt landed in "just a"
-two="$(cd "$j" && jj --no-pager log --no-graph -r 'description(substring:"just a") | description(substring:"both files")' -T '"x\n"' 2>/dev/null | grep -c x)"
-a_in_split="$(cd "$j" && jj --no-pager diff --name-only -r 'description(substring:"just a")' 2>/dev/null | grep -cx 'a.txt')"
+two="$(jj --no-pager log --no-graph -r 'description(substring:"just a") | description(substring:"both files")' -T '"x\n"' 2>/dev/null | grep -c x)"
+a_in_split="$(jj --no-pager diff --name-only -r 'description(substring:"just a")' 2>/dev/null | grep -cx 'a.txt')"
 [[ "$two" -eq 2 && "$a_in_split" -eq 1 ]] && jj_split=yes
 if [[ "$jj_split" == yes ]]; then
   win "S3 non-interactive split: jj split <path> -m carved a commit in two without an editor; git requires interactive rebase -i"
@@ -181,27 +174,25 @@ fi
 #   jj : `jj op restore <op>` rewinds the entire repo state at once.
 # ---------------------------------------------------------------------------
 j="$TMP/s4j"
-mkdir -p "$j"
+mkdir -p "$j" || exit 2
+cd "$j" || exit 2
 jj_timetravel=no
-(
-  cd "$j" || exit 2
-  jj git init >/dev/null 2>&1
-  echo one >one.txt
-  jj describe -m one >/dev/null 2>&1
-  op="$(jj --no-pager op log --no-graph -T 'id.short() ++ "\n"' 2>/dev/null | sed -n 1p)"
-  # several further operations
-  jj new -m two >/dev/null 2>&1
-  echo two >two.txt
-  jj bookmark create feat -r @ >/dev/null 2>&1
-  jj new -m three >/dev/null 2>&1
-  echo three >three.txt
-  jj st >/dev/null 2>&1
-  # one command rewinds ALL of it
-  jj op restore "$op" >/dev/null 2>&1
-)
+jj git init >/dev/null 2>&1
+echo one >one.txt
+jj describe -m one >/dev/null 2>&1
+op="$(jj --no-pager op log --no-graph -T 'id ++ "\n"' 2>/dev/null | sed -n 1p)"
+# several further operations
+jj new -m two >/dev/null 2>&1
+echo two >two.txt
+jj bookmark create feat -r @ >/dev/null 2>&1
+jj new -m three >/dev/null 2>&1
+echo three >three.txt
+jj st >/dev/null 2>&1
+# one command rewinds ALL of it
+jj op restore "$op" >/dev/null 2>&1
 # after restore: only one.txt exists, no feat bookmark, no two/three
-if [[ -f "$j/one.txt" && ! -f "$j/two.txt" && ! -f "$j/three.txt" ]]; then
-  nb="$(cd "$j" && jj --no-pager bookmark list 2>/dev/null | grep -c 'feat')"
+if [[ -f one.txt && ! -f two.txt && ! -f three.txt ]]; then
+  nb="$(jj --no-pager bookmark list 2>/dev/null | grep -c 'feat')"
   [[ "$nb" -eq 0 ]] && jj_timetravel=yes
 fi
 if [[ "$jj_timetravel" == yes ]]; then
