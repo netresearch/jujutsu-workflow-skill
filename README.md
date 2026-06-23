@@ -8,6 +8,17 @@ Coding agents are unreliable Git operators: they fold unrelated edits into one c
 - Cleaner patches — small, reviewable changes with unrelated edits split before handoff.
 - A Git-visible PR handoff that humans and CI can inspect with ordinary Git tools.
 
+## Why jj beats pure Git for agentic coding (proven)
+
+For speculative, iterative, multi-step agent work, jj is **superior to pure Git** — and this skill does not just assert it, it **proves** it with a runnable eval suite (`tests/superiority_evals.sh`, also run in CI) demonstrating four concrete wins:
+
+- **Reversible discards** — `jj op restore` recovers abandoned work; git's discarded *uncommitted* edits are unrecoverable.
+- **Conflicts don't block** — a conflicting `jj rebase` completes and records the conflict (and `jj undo` reverses it); `git rebase` halts mid-operation.
+- **Non-interactive history surgery** — `jj split <path> -m` carves a commit in two without an editor; git needs interactive `rebase -i`.
+- **Whole-repo time travel** — `jj op restore` rewinds many operations (commits + bookmarks) in one command; git has no single-command equivalent.
+
+This skill **claims** the advantage here, **proves** it in [the evals](tests/superiority_evals.sh), and **enforces** it in [`SKILL.md`](skills/jj-agent-workflow/SKILL.md) (jj-first whenever a `.jj/` repo is present). The full, evidence-backed thesis — including an honest **"when NOT to use jj"** — is in [why-jj-for-agents.md](skills/jj-agent-workflow/references/why-jj-for-agents.md).
+
 ## Use when
 
 - A coding agent works in a repository where `jj` is installed or allowed.
