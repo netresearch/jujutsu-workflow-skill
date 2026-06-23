@@ -24,12 +24,16 @@ command -v git >/dev/null 2>&1 || {
 won=0
 lost=0
 win() {
-  echo "jj WINS  — $1"
+  local msg="$1"
+  echo "jj WINS  — $msg"
   won=$((won + 1))
+  return 0
 }
 lose() {
-  echo "NOT SHOWN — $1"
+  local msg="$1"
+  echo "NOT SHOWN — $msg"
   lost=$((lost + 1))
+  return 0
 }
 
 TMP="$(mktemp -d)"
@@ -42,7 +46,10 @@ email = "eval@example.com"
 [ui]
 paginate = "never"
 EOF
-gitc() { git -c user.name=Eval -c user.email=eval@example.com "$@"; }
+gitc() {
+  git -c user.name=Eval -c user.email=eval@example.com "$@"
+  return
+}
 
 echo "=========================================================="
 echo " jj vs pure Git — agentic-coding superiority evals"
