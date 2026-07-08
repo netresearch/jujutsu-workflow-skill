@@ -46,6 +46,37 @@ Then follow the project's existing PR rules (templates, CODEOWNERS, signed commi
 required checks). This skill does not override them — see the repo's git-workflow /
 github-project conventions.
 
+## Sign-off (DCO) and SSH signing
+
+jj has **no `--signoff` / `-s` flag**. For repos that enforce DCO (every
+netresearch `*-skill` repo does), add the trailer as a **separate `-m` paragraph**
+on `jj describe` / `jj commit`:
+
+```bash
+jj describe -m 'feat(scope): subject' -m 'Signed-off-by: Full Name <email>'
+```
+
+jj preserves that trailer across a later `jj squash` / `jj rebase` / `jj split`, so
+describe it once and the sign-off survives the rewrites. Skip it and the skill-repo
+CI DCO check fails, forcing an amend + force-push — so make the trailer a default
+for every jj commit in those repos.
+
+For SSH-signed commits (a Git setup with `gpg.format=ssh`), point jj at the same key
+once:
+
+```bash
+jj config set --user signing.behavior own
+jj config set --user signing.backend  ssh
+jj config set --user signing.key      ~/.ssh/id_ed25519.pub
+```
+
+jj then re-signs automatically on **every** rewrite (`describe`, `squash`, `rebase`,
+`split`) — no extra step. Verify from Git in a colocated repo:
+
+```bash
+git verify-commit <commit_id>      # expect: Good "git" signature
+```
+
 ## Updating a PR after review
 
 Pick the strategy the project prefers and state which you used.
