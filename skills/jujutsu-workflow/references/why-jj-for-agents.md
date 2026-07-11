@@ -7,13 +7,13 @@ says when to reach for it.
 ## Use jj when
 
 - **Work is speculative and will need reshaping.** Non-interactive `jj split` /
-  `jj squash --from/--into` replace `git add -p` / `rebase -i`, which an agent
+  `jj squash --from/--into` replace `git add -p` / `git rebase -i`, which an agent
   cannot drive. See [command-map.md](command-map.md).
 - **You need real undo.** Every jj command lands in the operation log; `jj undo` /
   `jj op restore <id>` resets the whole repo — bookmarks and working copy, not just
   the index. See [recovery-playbook.md](recovery-playbook.md).
 - **A rebase might conflict.** A conflicting `jj rebase` completes and records the
-  conflict instead of leaving a half-finished git rebase/merge to detect and escape.
+  conflict instead of leaving a half-finished `git rebase` or `git merge` to detect and escape.
   See [recovery-playbook.md](recovery-playbook.md).
 - **Multiple agents touch the repo concurrently.** One `jj workspace` per agent
   avoids the single-writer working-copy trap. See
