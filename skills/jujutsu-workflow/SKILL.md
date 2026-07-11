@@ -66,4 +66,4 @@ One `jj workspace` per concurrent agent — never share a working copy. See [ref
 
 Run `${CLAUDE_SKILL_DIR}/scripts/verify_handoff.sh`, or report `jj --no-pager status`, `jj --no-pager log --limit 10`, `jj --no-pager diff --stat`, `git status --short --branch`. Report exact commands and output; never claim "done/tested/ready" without it; disclose force-pushes, recoveries, conflicts.
 
-**Why jj beats git for agents** (and when NOT to use it): [references/why-jj-for-agents.md](references/why-jj-for-agents.md).
+**When jj helps, and when it doesn't**: [references/why-jj-for-agents.md](references/why-jj-for-agents.md).
