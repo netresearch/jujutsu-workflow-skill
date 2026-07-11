@@ -26,7 +26,7 @@ Progressive-disclosure detail, loaded on demand:
 - **[recovery-playbook.md](../skills/jujutsu-workflow/references/recovery-playbook.md)** — operation log, undo/restore, first-class conflicts, divergent changes.
 - **[pr-handoff.md](../skills/jujutsu-workflow/references/pr-handoff.md)** — bookmark→push→PR (gh/glab), review-update strategies, the gate.
 - **[parallel-agents.md](../skills/jujutsu-workflow/references/parallel-agents.md)** — workspaces and the three documented jj-for-agents failure-mode mitigations.
-- **[why-jj-for-agents.md](../skills/jujutsu-workflow/references/why-jj-for-agents.md)** — the evidence-backed superiority thesis and an honest "when NOT to use jj".
+- **[why-jj-for-agents.md](../skills/jujutsu-workflow/references/why-jj-for-agents.md)** — the jj-vs-git decision guide: when it helps, when it doesn't.
 
 ### Scripts ([`skills/jujutsu-workflow/scripts/`](../skills/jujutsu-workflow/scripts/))
 

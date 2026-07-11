@@ -17,7 +17,7 @@ For speculative, iterative, multi-step agent work, jj is **superior to pure Git*
 - **Non-interactive history surgery** — `jj split <path> -m` carves a commit in two without an editor; git needs interactive `rebase -i`.
 - **Whole-repo time travel** — `jj op restore` rewinds many operations (commits + bookmarks) in one command; git has no single-command equivalent.
 
-This skill **claims** the advantage here, **proves** it in [the evals](tests/superiority_evals.sh), and **enforces** it in [`SKILL.md`](skills/jujutsu-workflow/SKILL.md) (jj-first whenever a `.jj/` repo is present). The full, evidence-backed thesis — including an honest **"when NOT to use jj"** — is in [why-jj-for-agents.md](skills/jujutsu-workflow/references/why-jj-for-agents.md).
+This skill **claims** the advantage here, **proves** it in [the evals](tests/superiority_evals.sh), and **enforces** it in [`SKILL.md`](skills/jujutsu-workflow/SKILL.md) (jj-first whenever a `.jj/` repo is present). The mechanism-grounded decision guide — when jj helps, when it doesn't — is in [why-jj-for-agents.md](skills/jujutsu-workflow/references/why-jj-for-agents.md).
 
 ## Use when
 

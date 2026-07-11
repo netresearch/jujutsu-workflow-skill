@@ -1,59 +1,28 @@
-# Why jj beats Git workflows for agentic development
+# jj vs Git: when it helps, when it doesn't
 
-A grounded argument — each claim is tied to a mechanism, not a benchmark. (Be
-skeptical of "Nx faster" / "87% auto-resolve" / "quantum-resistant" claims you see
-on some jj skills; this skill makes none of them.)
+A decision guide, not a sales pitch. Each "use jj when" bullet points to the
+reference doc that owns the mechanism and the verified commands — this page only
+says when to reach for it.
 
-## The core mismatch jj fixes
+## Use jj when
 
-Git was built for humans who plan a commit, stage it, and commit deliberately.
-Agents work the opposite way: they make speculative, iterative, often-wrong edits
-and need to reshape them afterwards. Git punishes that with `reset`/`stash`/
-`checkout`/`rebase -i` footguns; jj is built around it. The split this skill enforces
-— **jj for local change-shaping, Git for the remote contract** — gives the agent a
-forgiving workspace and humans an ordinary Git PR.
+- **Work is speculative and will need reshaping.** Non-interactive `jj split` /
+  `jj squash --from/--into` replace `git add -p` / `rebase -i`, which an agent
+  cannot drive. See [command-map.md](command-map.md).
+- **You need real undo.** Every jj command lands in the operation log; `jj undo` /
+  `jj op restore <id>` resets the whole repo — bookmarks and working copy, not just
+  the index. See [recovery-playbook.md](recovery-playbook.md).
+- **A rebase might conflict.** A conflicting `jj rebase` completes and records the
+  conflict instead of leaving a half-finished git rebase/merge to detect and escape.
+  See [recovery-playbook.md](recovery-playbook.md).
+- **Multiple agents touch the repo concurrently.** One `jj workspace` per agent
+  avoids the single-writer working-copy trap. See
+  [parallel-agents.md](parallel-agents.md).
+- **You still want ordinary Git PRs/CI/review at the boundary.** A colocated repo
+  keeps a normal `.git/`; adopting jj is a local choice, not a team migration. See
+  [pr-handoff.md](pr-handoff.md).
 
-## Concrete advantages (with the mechanism)
-
-1. **Universal, reversible undo.** Every repo-modifying command lands in the
-   operation log; `jj undo` / `jj op restore <id>` returns the *entire* repo to a
-   prior state — bookmarks, working copy, and all. There is no git-reflog detective
-   work and no irrecoverable `git reset --hard`. For an agent that will make
-   mistakes, "any action is reversible" is the single biggest safety win.
-
-2. **Conflicts are data, not a halt.** A conflicting `jj rebase` *completes* and
-   records the conflict inside the commit (`jj status` flags it; `jj resolve --list`
-   enumerates it), instead of dropping git into an aborted-rebase / detached-HEAD
-   limbo the agent must detect and escape. The agent can keep working and resolve
-   deliberately — or `jj undo` the whole thing cleanly. (Verified hands-on.)
-
-3. **No staging area = one fewer hidden state to corrupt.** There is no index, so an
-   agent cannot "forget to `git add`", half-stage a file, or be misled by a dirty
-   index. The working copy simply *is* a commit, snapshotted when a jj command runs.
-
-4. **Declarative, non-interactive history surgery.** Turning messy agent output into
-   a clean PR is a few non-interactive commands — `jj split <path>`, `jj squash
-   --from/--into`, `jj describe -m` — instead of an interactive `git add -p` /
-   `git rebase -i` session that an agent cannot drive. This is precisely where jj
-   shines for "clean up what the agent produced". (Verified hands-on.)
-
-5. **Stable change IDs.** A change keeps its ID across rewrites/rebases, so an agent
-   can reference a commit reliably even as the underlying hash changes — no
-   "the hash moved after rebase" class of error.
-
-6. **Isolation that fits parallel agents.** `jj workspace` gives each concurrent
-   agent its own working copy over one shared store/op-log — cleaner than juggling
-   `git worktree` (and free of the colocated-git hazards a second git worktree adds).
-
-7. **Zero migration cost.** A colocated repo keeps a normal `.git/`; teammates, CI,
-   `gh`/`glab`, and code review see ordinary branches and commits. Adopting jj is a
-   local choice, not a team-wide migration.
-
-Independent signal that agents can use jj well: the TabbyML *jj-benchmark* (63 jj
-tasks) reports strong completion rates for current frontier models — so the
-bottleneck is workflow discipline, which is exactly what this skill supplies.
-
-## When NOT to use jj (be honest)
+## When NOT to use jj
 
 jj is not a silver bullet. Prefer plain Git (or git-worktree stacked PRs) when:
 
@@ -68,23 +37,10 @@ jj is not a silver bullet. Prefer plain Git (or git-worktree stacked PRs) when:
   flags, and the snapshot hooks, jj's interactivity will *hurt* an agent. If you
   can't set those, the risk outweighs the reward.
 
-Known sharp edges this skill mitigates but which remain real: **commit absorption**
-(everything collapsing into one commit), the **single-writer working copy**
-(parallel agents need workspaces), and the **snapshot-on-command-only** behavior
-(needs hooks). See [parallel-agents.md](parallel-agents.md) and
-[agent-safety.md](agent-safety.md).
+## Known sharp edges (mitigated, not eliminated)
 
-## Bottom line
-
-Use jj where its advantages apply — speculative, iterative, multi-step agent work
-that needs reshaping and a strong undo — and keep Git as the interface to everyone
-else. That combination, with the safety rules enforced, is what makes an agent both
-faster and safer than driving Git directly.
-
-## Further reading
-
-- Jujutsu docs: <https://docs.jj-vcs.dev/latest/>
-- "Avoid Losing Work with jj for AI coding agents" — panozzaj (snapshot nuance + hooks)
-- "Use Jujutsu, Not Git" — slavakurilyak (op-log-as-recovery thesis)
-- "Why jj is perfect for AI-generated code" — cesar.velandia (reviewer-cleanup angle)
-- `2389-research/agentjj` — the counter-case: documents the failure modes this skill mitigates
+Commit absorption (everything collapsing into one commit), the single-writer
+working copy (parallel agents need workspaces), colocated git/jj desync, and the
+snapshot-on-command-only behavior (needs hooks) are real. See
+[agent-safety.md](agent-safety.md) and [parallel-agents.md](parallel-agents.md) for
+the mechanism and mitigation for each.

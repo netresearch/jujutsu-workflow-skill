@@ -79,7 +79,7 @@ skills/jujutsu-workflow/
 │   ├── pr-handoff.md                # bookmark→push→PR (gh/glab), CI, cleanup, review-comment strategies
 │   ├── git-interop.md               # colocated detection, exclusive-mode, read-only git, traps
 │   ├── parallel-agents.md           # workspaces; absorption & parallel-bundling mitigations
-│   └── why-jj-for-agents.md         # evidence-backed thesis + "when NOT to use jj"
+│   └── why-jj-for-agents.md         # decision guide: when jj helps + when not to use it
 └── scripts/
     ├── detect_jj_state.sh           # git-only / jj-only / colocated detection (tested)
     └── verify_handoff.sh            # final verification gate (tested)
