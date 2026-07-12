@@ -1,0 +1,262 @@
+[
+  {
+    "name": "pager-hang-avoidance",
+    "prompt": "In this jj-managed repo, show me the operation log and current status so we can review before making changes.",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "--no-pager|ui\\.paginate",
+        "description": "Avoids the pager that hangs a non-interactive agent (jj pages output through less by default)"
+      },
+      {
+        "type": "content_contains",
+        "value": "jj op log",
+        "description": "Uses the operation log to show what happened"
+      },
+      {
+        "type": "content_regex",
+        "value": "jj (--no-pager )?status",
+        "description": "Reports current working-copy status"
+      }
+    ]
+  },
+  {
+    "name": "describe-noninteractive",
+    "prompt": "I finished editing the auth module in this jj repo. Record this as a change with the message 'fix: validate empty tokens'.",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "jj (describe|commit)[^\\n]*(-m|--message)",
+        "description": "Uses -m directly, avoiding the bare describe/commit form that opens $EDITOR and hangs an agent"
+      },
+      {
+        "type": "content_contains",
+        "value": "fix: validate empty tokens",
+        "description": "Uses the exact requested commit message"
+      }
+    ]
+  },
+  {
+    "name": "split-noninteractive",
+    "prompt": "This jj change mixes a schema migration with unrelated test-fixture fixes. Split the test file changes into their own change with message 'test: fix fixture paths', non-interactively.",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "jj split [^\\n]*(-m|--message)",
+        "description": "Uses jj split <path> -m, avoiding the interactive diff editor that plain 'jj split' launches"
+      },
+      {
+        "type": "content_contains",
+        "value": "test: fix fixture paths",
+        "description": "Uses the exact requested message for the split-out change"
+      }
+    ]
+  },
+  {
+    "name": "squash-noninteractive",
+    "prompt": "Combine my last two jj changes into one, with the message 'feat: add rate limiter', without opening an editor.",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "jj squash[^\\n]*(-m|--message|--into)",
+        "description": "Uses -m or --from/--into, avoiding the bare 'jj squash' / 'jj squash -i' forms that open an editor or TUI"
+      },
+      {
+        "type": "content_contains",
+        "value": "squash",
+        "description": "Uses jj squash rather than an unrelated command"
+      }
+    ]
+  },
+  {
+    "name": "git-handoff-bookmark-push",
+    "prompt": "My jj change is ready. Get it onto GitHub as a PR against main.",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "jj bookmark create",
+        "description": "Creates a named bookmark first (jj's equivalent of a Git branch) before pushing"
+      },
+      {
+        "type": "content_regex",
+        "value": "jj git push[^\\n]*(--bookmark|--change|-b|-c)",
+        "description": "Pushes via 'jj git push', not a raw 'git push'"
+      },
+      {
+        "type": "content_contains",
+        "value": "gh pr create",
+        "description": "Opens the PR with gh once the bookmark is pushed"
+      }
+    ]
+  },
+  {
+    "name": "fetch-rebase-not-pull",
+    "prompt": "How do I update my current jj change with the latest commits from origin/main? Git people would call this 'pulling'.",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "jj git fetch",
+        "description": "jj has no single 'pull' command; fetch is the first of the two-step equivalent"
+      },
+      {
+        "type": "content_contains",
+        "value": "jj rebase",
+        "description": "Rebases onto the fetched trunk as the second step, instead of a merge"
+      }
+    ]
+  },
+  {
+    "name": "colocated-no-raw-git-mutation",
+    "prompt": "This repo has both a .git and a .jj directory. I need to stage and commit my fix. What commands do I run?",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "jj (describe|commit|new)",
+        "description": "Mutates via jj commands in a colocated repo, instead of raw 'git add'/'git commit' which can desync the two"
+      },
+      {
+        "type": "content_regex",
+        "value": "colocat",
+        "description": "Names the colocated repo situation explicitly"
+      }
+    ]
+  },
+  {
+    "name": "recovery-undo-not-git-reset",
+    "prompt": "My last `jj rebase` in this repo broke the working copy. How do I get back to how it was right before I ran that command, and what underlying mechanism makes that recovery possible?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "jj undo",
+        "description": "Uses jj's reversible operation-log undo rather than a raw 'git reset --hard' (dangerous in a colocated repo)"
+      },
+      {
+        "type": "content_regex",
+        "value": "op log|op restore",
+        "description": "References the operation log as the recovery mechanism"
+      }
+    ]
+  },
+  {
+    "name": "conflict-resolution-manual-markers",
+    "prompt": "After a jj rebase, `jj status` shows a file marked '(conflict)'. Resolve it without launching any interactive merge tool.",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "conflict marker|edit the file|<<<<<<<",
+        "description": "Edits the conflict markers directly in the file rather than invoking a merge tool"
+      },
+      {
+        "type": "content_regex",
+        "value": "jj resolve (--list|-l)",
+        "description": "Verifies resolution via 'jj resolve --list' or '-l', not bare 'jj resolve' which launches an interactive tool and hangs"
+      }
+    ]
+  },
+  {
+    "name": "parallel-agents-workspace-not-worktree",
+    "prompt": "Two coding agents need to work on this jj repo at the same time without interfering with each other's working copy. What's the jj-native way to set this up?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "jj workspace",
+        "description": "Uses jj's native workspace mechanism for concurrent working copies, rather than a git-worktree-style answer"
+      },
+      {
+        "type": "content_regex",
+        "value": "one.*(workspace|working copy)|never share",
+        "description": "States the one-workspace-per-agent rule — never share a single working copy across concurrent agents"
+      }
+    ]
+  },
+  {
+    "name": "detect-colocated-state",
+    "prompt": "Before touching this repository, how do I tell whether it's a plain git repo, a jj repo, or a colocated jj+git repo?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": ".jj",
+        "description": "Checks for the .jj directory as the discriminator"
+      },
+      {
+        "type": "content_regex",
+        "value": "colocat",
+        "description": "Names the colocated (.jj AND .git present) case explicitly"
+      }
+    ]
+  },
+  {
+    "name": "snapshot-not-continuous",
+    "prompt": "I edited three files in this jj repo but haven't run any jj command yet. Are my edits already safe in the operation log if the agent session crashes right now?",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "(not|only when|until).*(jj command|run)",
+        "description": "Corrects the myth that jj auto-saves continuously — it snapshots the working copy only when a jj command runs"
+      },
+      {
+        "type": "content_contains",
+        "value": "jj status",
+        "description": "Recommends running a jj command (e.g. status) to capture the edits"
+      }
+    ]
+  },
+  {
+    "name": "verify-before-done",
+    "prompt": "You just finished a jj-based change and want to tell the user it's ready to merge. What must you check and report first?",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "jj (--no-pager )?status|verify_handoff\\.sh",
+        "description": "Reports working-copy status, or runs the verification script, as part of the verification gate"
+      },
+      {
+        "type": "content_regex",
+        "value": "jj (--no-pager )?log|verify_handoff\\.sh",
+        "description": "Reports the change graph, or runs the verification script, as part of the verification gate"
+      },
+      {
+        "type": "content_regex",
+        "value": "git status|verify_handoff\\.sh",
+        "description": "Also cross-checks with read-only git status (or the verification script), since Git is the canonical PR/CI interface"
+      }
+    ]
+  },
+  {
+    "name": "hook-recipe-session-safety",
+    "prompt": "Set up this jj repo so that an agent's edits are always captured in the operation log at session start, even if the agent forgets to run a jj command first.",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "SessionStart",
+        "description": "Wires a hook at session start (Claude Code settings.json) that runs a jj command to force a snapshot"
+      },
+      {
+        "type": "content_contains",
+        "value": "jj status",
+        "description": "The hook command itself is a jj status (or similar) invocation"
+      }
+    ]
+  },
+  {
+    "name": "identity-signing-ci",
+    "prompt": "Running jj inside a fresh CI container to make a signed commit — what do I need to configure first, since jj won't pick up my git config automatically?",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "jj config set --user user\\.name",
+        "description": "jj does not read git's user.name automatically; it must be set explicitly"
+      },
+      {
+        "type": "content_regex",
+        "value": "jj config set --user user\\.email",
+        "description": "jj does not read git's user.email automatically; it must be set explicitly"
+      },
+      {
+        "type": "content_contains",
+        "value": "signing",
+        "description": "Addresses the signing configuration needed for signed commits"
+      }
+    ]
+  }
+]
