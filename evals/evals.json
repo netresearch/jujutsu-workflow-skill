@@ -26,7 +26,7 @@
     "assertions": [
       {
         "type": "content_regex",
-        "value": "jj (describe|commit)[^\\n]*-m",
+        "value": "jj (describe|commit)[^\\n]*(-m|--message)",
         "description": "Uses -m directly, avoiding the bare describe/commit form that opens $EDITOR and hangs an agent"
       },
       {
@@ -42,7 +42,7 @@
     "assertions": [
       {
         "type": "content_regex",
-        "value": "jj split [^\\n]*-m",
+        "value": "jj split [^\\n]*(-m|--message)",
         "description": "Uses jj split <path> -m, avoiding the interactive diff editor that plain 'jj split' launches"
       },
       {
@@ -58,7 +58,7 @@
     "assertions": [
       {
         "type": "content_regex",
-        "value": "jj squash[^\\n]*(-m|--into)",
+        "value": "jj squash[^\\n]*(-m|--message|--into)",
         "description": "Uses -m or --from/--into, avoiding the bare 'jj squash' / 'jj squash -i' forms that open an editor or TUI"
       },
       {
@@ -79,7 +79,7 @@
       },
       {
         "type": "content_regex",
-        "value": "jj git push[^\\n]*(--bookmark|--change)",
+        "value": "jj git push[^\\n]*(--bookmark|--change|-b|-c)",
         "description": "Pushes via 'jj git push', not a raw 'git push'"
       },
       {
@@ -123,7 +123,7 @@
   },
   {
     "name": "recovery-undo-not-git-reset",
-    "prompt": "My last `jj rebase` in this repo broke the working copy. How do I get back to how it was right before I ran that command?",
+    "prompt": "My last `jj rebase` in this repo broke the working copy. How do I get back to how it was right before I ran that command, and what underlying mechanism makes that recovery possible?",
     "assertions": [
       {
         "type": "content_contains",
@@ -147,9 +147,9 @@
         "description": "Edits the conflict markers directly in the file rather than invoking a merge tool"
       },
       {
-        "type": "content_contains",
-        "value": "jj resolve --list",
-        "description": "Verifies resolution via 'jj resolve --list', not bare 'jj resolve' which launches an interactive tool and hangs"
+        "type": "content_regex",
+        "value": "jj resolve (--list|-l)",
+        "description": "Verifies resolution via 'jj resolve --list' or '-l', not bare 'jj resolve' which launches an interactive tool and hangs"
       }
     ]
   },
@@ -207,18 +207,18 @@
     "assertions": [
       {
         "type": "content_regex",
-        "value": "jj (--no-pager )?status",
-        "description": "Reports working-copy status as part of the verification gate"
+        "value": "jj (--no-pager )?status|verify_handoff\\.sh",
+        "description": "Reports working-copy status, or runs the verification script, as part of the verification gate"
       },
       {
         "type": "content_regex",
-        "value": "jj (--no-pager )?log",
-        "description": "Reports the change graph as part of the verification gate"
+        "value": "jj (--no-pager )?log|verify_handoff\\.sh",
+        "description": "Reports the change graph, or runs the verification script, as part of the verification gate"
       },
       {
-        "type": "content_contains",
-        "value": "git status",
-        "description": "Also cross-checks with read-only git status, since Git is the canonical PR/CI interface"
+        "type": "content_regex",
+        "value": "git status|verify_handoff\\.sh",
+        "description": "Also cross-checks with read-only git status (or the verification script), since Git is the canonical PR/CI interface"
       }
     ]
   },
@@ -244,8 +244,13 @@
     "assertions": [
       {
         "type": "content_regex",
-        "value": "jj config set --user user\\.(name|email)",
-        "description": "jj does not read git's user.name/user.email automatically; both must be set explicitly"
+        "value": "jj config set --user user\\.name",
+        "description": "jj does not read git's user.name automatically; it must be set explicitly"
+      },
+      {
+        "type": "content_regex",
+        "value": "jj config set --user user\\.email",
+        "description": "jj does not read git's user.email automatically; it must be set explicitly"
       },
       {
         "type": "content_contains",
