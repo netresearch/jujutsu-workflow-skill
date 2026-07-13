@@ -5,7 +5,7 @@ license: "(MIT AND CC-BY-SA-4.0). See LICENSE-MIT and LICENSE-CC-BY-SA-4.0"
 compatibility: "Verified against jj 0.42.0. jj's CLI moves fast; re-check flags with `jj <cmd> --help` on other versions."
 metadata:
   author: Netresearch DTT GmbH
-  version: "0.1.0"
+  version: "0.2.0"
   repository: https://github.com/netresearch/jujutsu-workflow-skill
 ---
 
