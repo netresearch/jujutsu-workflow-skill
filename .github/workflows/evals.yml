@@ -3,50 +3,37 @@ name: Evals
 # Continuous PROOF: installs the pinned jj version and runs the deterministic
 # eval suites that (a) prove the skill's documented workflow works end-to-end and
 # (b) demonstrate jj's superiority over pure Git for agentic coding.
-# No reusable workflow exists that provisions jj + runs shell evals, so this is a
-# thin, hardened, repo-specific job (pinned actions, read-only token).
+#
+# Thin caller of the shared script-check reusable: jj is provisioned in
+# `pre-command` (it runs in the same job, so the $GITHUB_PATH entry carries into
+# the check), and the two eval suites run as the check. The checkout pin and
+# harden-runner are maintained centrally.
 
 on:
   push:
     branches: [main]
   pull_request:
 
-permissions:
-  contents: read
-
-env:
-  JJ_VERSION: v0.42.0
+permissions: {}
 
 jobs:
   evals:
-    name: jj evals (smoke + superiority)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
-        with:
-          egress-policy: audit
-
-      - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-
-      - name: Install jj ${{ env.JJ_VERSION }}
-        run: |
-          set -euo pipefail
-          mkdir -p "$HOME/.local/bin"
-          url="https://github.com/jj-vcs/jj/releases/download/${JJ_VERSION}/jj-${JJ_VERSION}-x86_64-unknown-linux-musl.tar.gz"
-          tmpd="$(mktemp -d)"
-          curl -fsSL "$url" | tar -xz -C "$tmpd"
-          install -m755 "$(find "$tmpd" -name jj -type f | head -1)" "$HOME/.local/bin/jj"
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-
-      - name: Versions
-        run: |
-          jj --version
-          git --version
-
-      - name: Smoke test (skill workflow works end-to-end)
-        run: bash tests/smoke_test.sh
-
-      - name: Superiority evals (jj > pure git for agents)
-        run: bash tests/superiority_evals.sh
+    uses: netresearch/.github/.github/workflows/script-check.yml@main
+    permissions:
+      contents: read
+    with:
+      # jj release pin. Kept here (not as a workflow env) because a reusable
+      # caller's `with:` cannot read `env:`.
+      pre-command: |
+        JJ_VERSION=v0.42.0
+        mkdir -p "$HOME/.local/bin"
+        url="https://github.com/jj-vcs/jj/releases/download/${JJ_VERSION}/jj-${JJ_VERSION}-x86_64-unknown-linux-musl.tar.gz"
+        tmpd="$(mktemp -d)"
+        curl -fsSL "$url" | tar -xz -C "$tmpd"
+        install -m755 "$(find "$tmpd" -name jj -type f | head -1)" "$HOME/.local/bin/jj"
+        echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      check-cmd: |
+        jj --version
+        git --version
+        bash tests/smoke_test.sh
+        bash tests/superiority_evals.sh
