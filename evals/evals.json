@@ -326,5 +326,47 @@
         "description": "Requires committing or stashing with git first, or using git instead"
       }
     ]
+  },
+  {
+    "name": "describe-before-bookmark-push",
+    "prompt": "I just ran `jj new` to start fresh. Now create a bookmark at @- called feat/login and push it so I can open a PR.",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "describ|description|message",
+        "description": "Checks that the target change has a description — jj refuses to push a commit without one"
+      },
+      {
+        "type": "content_regex",
+        "value": "jj (--no-pager )?log|jj (--no-pager )?status",
+        "description": "Inspects what @- actually points at before bookmarking it"
+      },
+      {
+        "type": "content_contains",
+        "value": "jj bookmark create",
+        "description": "Uses the bookmark as the git-boundary bridge"
+      }
+    ]
+  },
+  {
+    "name": "identity-set-after-work-needs-metaedit",
+    "prompt": "In CI I forgot to configure jj's user.name and user.email before making the change. I've set them now but the commit still shows the old author. How do I fix it?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "jj metaedit",
+        "description": "Uses metaedit, the command jj itself points at, rather than re-describing"
+      },
+      {
+        "type": "content_regex",
+        "value": "--update-author",
+        "description": "Names the flag that rewrites the author on an existing change"
+      },
+      {
+        "type": "content_regex",
+        "value": "future commits|only.{0,30}future|already (exists|created)",
+        "description": "Explains that config applies to future commits only, which is why the author did not change"
+      }
+    ]
   }
 ]

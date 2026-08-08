@@ -2,7 +2,7 @@
 name: jujutsu-workflow
 description: "Use when a coding agent works in a repository where Jujutsu (jj) is available (a `.jj/` directory) — running jj commands, making speculative edits, splitting changes, recovering with the operation log (jj undo / jj op restore), handing off a PR to Git/GitHub/GitLab, updating a PR after review, or coordinating parallel agents. Uses jj as the local change-management layer while keeping Git as the canonical remote, PR, CI, and audit interface. Also use to avoid jj's agent footguns (pager/editor hangs, commit absorption, colocated git/jj desync) or to replace fragile git reset/checkout/stash/rebase recovery with reversible jj operations."
 license: "(MIT AND CC-BY-SA-4.0). See LICENSE-MIT and LICENSE-CC-BY-SA-4.0"
-compatibility: "Verified against jj 0.42.0. jj's CLI moves fast; re-check flags with `jj <cmd> --help` on other versions."
+compatibility: "Verified against jj 0.42.0 and 0.43.0. Re-check flags with `jj <cmd> --help` on other versions."
 metadata:
   author: Netresearch DTT GmbH
   version: "0.3.0"
@@ -42,18 +42,18 @@ jj describe -m "<project-conventional message>"
 jj new -m "<next unit>"     # one change per logical unit
 ```
 
-Split a mixed change non-interactively: `jj split <path> -m "<msg>"`. See [references/command-map.md](references/command-map.md).
+Split non-interactively: `jj split <path> -m "<msg>"`. See [references/command-map.md](references/command-map.md).
 
 ## 4. Recover (reversible)
 
-`jj --no-pager op log` → `jj undo` or `jj op restore <id>`. Conflicts are first-class: `jj status` flags them; resolve by editing markers, then verify. See [references/recovery-playbook.md](references/recovery-playbook.md).
+`jj --no-pager op log` → `jj undo` or `jj op restore <id>`. Conflicts are first-class: `jj status` flags them; edit markers, then verify. See [references/recovery-playbook.md](references/recovery-playbook.md).
 
 ## 5. Hand off via Git
 
 ```bash
 jj git fetch
 jj rebase -d <default-branch>
-jj bookmark create <branch> -r @-
+jj bookmark create <branch> -r @-    # every pushed commit needs a description
 jj git push --bookmark <branch>      # new bookmarks push directly
 ```
 

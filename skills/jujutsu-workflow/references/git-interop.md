@@ -18,7 +18,7 @@ of five modes:
 
 `worktree-shadowed` exits **3**, not 0. Treat that exit code as a stop sign.
 
-Authoritative colocation check: `jj git colocation status`. In jj 0.42,
+Authoritative colocation check: `jj git colocation status`. In jj 0.42 and 0.43,
 `jj git init` is **colocated by default** (`--no-colocate` opts out), so most jj
 repos an agent meets are colocated.
 
@@ -111,7 +111,7 @@ rather than improvising. What is actually available, verified against Claude Cod
 Only when asked. In the repo root:
 
 ```bash
-jj git init            # colocated by default in 0.42 (adds .jj/ beside .git/)
+jj git init            # colocated by default (adds .jj/ beside .git/)
 jj config set --user ui.paginate never
 ```
 
@@ -185,8 +185,10 @@ already put you in one before you could choose, you are in the
   --to @-` before re-pushing.
 - After a PR merges, delete the local bookmark (`jj bookmark delete <name>`) and
   `jj git fetch` to drop the remote-tracking ref.
-- Push new bookmarks directly with `jj git push --bookmark <name>` (no `--allow-new`
-  in 0.42).
+- Push new bookmarks directly with `jj git push --bookmark <name>` (no
+  `--allow-new`). Every commit in the pushed range must be
+  **described** — `jj git push` rejects any with no message; see
+  [pr-handoff.md](pr-handoff.md).
 
 ## Leave a Git-legible result
 

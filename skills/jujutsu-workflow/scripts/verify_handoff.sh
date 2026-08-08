@@ -123,16 +123,26 @@ ready=true
 
 if $json; then
   printf '{"ready":%s,"fails":[' "$ready"
-  for i in "${!fails[@]}"; do [[ $i -gt 0 ]] && printf ','; printf '"%s"' "${fails[$i]//\"/\'}"; done
+  for i in "${!fails[@]}"; do
+    [[ $i -gt 0 ]] && printf ','
+    printf '"%s"' "${fails[$i]//\"/\'}"
+  done
   printf '],"warns":['
-  for i in "${!warns[@]}"; do [[ $i -gt 0 ]] && printf ','; printf '"%s"' "${warns[$i]//\"/\'}"; done
+  for i in "${!warns[@]}"; do
+    [[ $i -gt 0 ]] && printf ','
+    printf '"%s"' "${warns[$i]//\"/\'}"
+  done
   printf ']}\n'
 else
   echo "=== handoff verification gate ==="
-  echo "--- jj status ---";              jj --no-pager status 2>&1 || true
-  echo "--- jj log (recent) ---";        jj --no-pager log --limit 5 2>&1 || true
-  echo "--- jj diff --stat ---";         jj --no-pager diff --stat 2>&1 || true
-  echo "--- git status (verify) ---";    git status --short --branch 2>&1 || true
+  echo "--- jj status ---"
+  jj --no-pager status 2>&1 || true
+  echo "--- jj log (recent) ---"
+  jj --no-pager log --limit 5 2>&1 || true
+  echo "--- jj diff --stat ---"
+  jj --no-pager diff --stat 2>&1 || true
+  echo "--- git status (verify) ---"
+  git status --short --branch 2>&1 || true
   echo "================================"
   for w in "${warns[@]}"; do echo "WARN: $w"; done
   for f in "${fails[@]}"; do echo "FAIL: $f"; done
