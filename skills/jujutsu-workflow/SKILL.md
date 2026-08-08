@@ -11,7 +11,7 @@ metadata:
 
 # Jujutsu Workflow
 
-For agentic coding, **prefer `jj` (Jujutsu) over raw `git`** whenever a `.jj/` repo is present. Git stays the canonical remote/PR/CI/audit interface: mutate with `jj`, verify with read-only Git.
+**Prefer `jj` (Jujutsu) over raw `git`** whenever a `.jj/` repo is present. Git stays the canonical remote/PR/CI/audit interface: mutate with `jj`, verify with read-only Git.
 
 ## 1. Detect & gate first
 
@@ -20,14 +20,14 @@ Run `${CLAUDE_SKILL_DIR}/scripts/detect_jj_state.sh`, or check manually:
 - `.jj/` present → jj repo: use `jj`, never **mutating** raw `git`.
 - `.jj/` **and** `.git/` → colocated: mutate with `jj`, read with git, never touch the git index/staging.
 - only `.git/` → plain Git repo: do not introduce `jj` unless asked.
-- in a git worktree, `jj root` ≠ `git rev-parse --show-toplevel` → **shadowed** (exit 3): jj answers for the parent repo. Run no `jj` — use git, then ask.
+- in a git worktree, `jj root` ≠ `git rev-parse --show-toplevel` → **shadowed** (exit 3): jj answers for the parent repo. Run no `jj`; use git, then ask.
 
 See [references/git-interop.md](references/git-interop.md).
 
 ## 2. Agent-safety rules (non-negotiable)
 
 - Always `--no-pager`, or set `jj config set --user ui.paginate never`.
-- Always `-m`. **Never** run editor/TUI forms — bare `jj describe|commit|squash`, `jj split`, `jj resolve`, `jj diffedit` — they hang agents.
+- Always `-m`. **Never** run editor/TUI forms — bare `jj describe|commit|squash`, `jj split` (interactive), `jj squash -i`, `jj resolve`, `jj diffedit` — they hang agents.
 - `jj` snapshots the working copy only when a jj command runs, **not** on every file write.
 
 See [references/agent-safety.md](references/agent-safety.md).

@@ -49,6 +49,17 @@ warning=""
 # Resolve a possibly-relative git path to a physical absolute path.
 abspath() { (cd "$1" 2>/dev/null && pwd -P) || true; }
 
+# Escape a value for embedding in a JSON string. Paths may legally contain a
+# double quote or a backslash, which would otherwise emit unparseable --json.
+json_escape() {
+  local s=${1//\\/\\\\}
+  s=${s//\"/\\\"}
+  s=${s//$'\n'/\\n}
+  s=${s//$'\r'/\\r}
+  s=${s//$'\t'/\\t}
+  printf '%s' "$s"
+}
+
 git_wt_dir=""
 git_common_dir=""
 in_git_worktree=false
@@ -107,8 +118,8 @@ fi
 
 # Working-copy state: clean / dirty / conflicted.
 if $shadowed; then
-  # Deliberately NOT `jj status` — it would report the parent workspace's files
-  # and snapshot them into the parent's @. git is the only truthful source here.
+  # Deliberately NOT `jj status` — it answers for the parent workspace and lists
+  # files this directory does not contain. git is the only truthful source here.
   if [[ -n "$(git status --porcelain 2>/dev/null)" ]]; then
     wc_state="dirty"
   else
@@ -127,18 +138,18 @@ fi
 
 if $json; then
   printf '{'
-  printf '"mode":"%s",' "$mode"
+  printf '"mode":"%s",' "$(json_escape "$mode")"
   printf '"colocated":%s,' "$colocated"
   printf '"shadowed":%s,' "$shadowed"
-  printf '"git_root":"%s",' "$git_root"
-  printf '"jj_root":"%s",' "$jj_root"
-  printf '"git_dir":"%s",' "$git_dir"
+  printf '"git_root":"%s",' "$(json_escape "$git_root")"
+  printf '"jj_root":"%s",' "$(json_escape "$jj_root")"
+  printf '"git_dir":"%s",' "$(json_escape "$git_dir")"
   printf '"git_worktree":%s,' "$in_git_worktree"
-  printf '"jj_version":"%s",' "$jj_version"
-  printf '"ui_paginate":"%s",' "$paginate"
-  printf '"default_branch":"%s",' "$default_branch"
-  printf '"working_copy":"%s",' "$wc_state"
-  printf '"warning":"%s"' "$warning"
+  printf '"jj_version":"%s",' "$(json_escape "$jj_version")"
+  printf '"ui_paginate":"%s",' "$(json_escape "$paginate")"
+  printf '"default_branch":"%s",' "$(json_escape "$default_branch")"
+  printf '"working_copy":"%s",' "$(json_escape "$wc_state")"
+  printf '"warning":"%s"' "$(json_escape "$warning")"
   printf '}\n'
 else
   if $shadowed; then
