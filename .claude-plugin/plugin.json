@@ -1,6 +1,6 @@
 {
   "name": "jujutsu-workflow",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Agent-safe version control with Jujutsu (jj): jj as the local change layer, Git as the canonical remote/PR/CI/audit interface",
   "repository": "https://github.com/netresearch/jujutsu-workflow-skill",
   "license": "(MIT AND CC-BY-SA-4.0)",
