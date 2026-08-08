@@ -88,6 +88,21 @@ jj config set --user user.name  "Your Name"
 jj config set --user user.email "you@example.com"
 ```
 
+**Set the identity before you start working.** The config applies to *future*
+commits only — the working-copy commit that already exists keeps the old author.
+jj 0.43 says so when you set it:
+
+```text
+Warning: This setting will only impact future commits.
+The author of the working copy will stay "V <v@example.com>".
+To change the working copy author, use "jj metaedit --update-author"
+```
+
+An agent that configures identity after making changes will otherwise push a
+commit authored by the wrong (or an empty) identity, which fails DCO. If you hit
+it, run `jj metaedit --update-author` on the affected change rather than
+re-describing it.
+
 For signed commits, configure signing in jj config (`signing.behavior = "own"`,
 `signing.backend = "ssh"` or `"gpg"`); jj signs commits it creates. Confirm the
 project's signing requirement before pushing.

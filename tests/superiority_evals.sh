@@ -71,7 +71,7 @@ gitc init -q
 echo v1 >f.txt
 gitc add f.txt
 gitc commit -qm v1
-echo v2 >f.txt           # uncommitted edit
+echo v2 >f.txt            # uncommitted edit
 gitc checkout -q -- f.txt # agent "discards" it
 git_recovered_v2=no
 [[ "$(cat f.txt)" == "v2" ]] && git_recovered_v2=yes # it won't be
@@ -84,7 +84,7 @@ jj new -m feature >/dev/null 2>&1
 echo important >f.txt
 jj st >/dev/null 2>&1 # snapshot
 op="$(jj --no-pager op log --no-graph -T 'id ++ "\n"' 2>/dev/null | sed -n 1p)"
-jj abandon >/dev/null 2>&1     # agent "discards" the whole change
+jj abandon >/dev/null 2>&1          # agent "discards" the whole change
 jj op restore "$op" >/dev/null 2>&1 # recover it
 jj_recovered=no
 [[ "$(cat f.txt 2>/dev/null)" == "important" ]] && jj_recovered=yes

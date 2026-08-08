@@ -34,6 +34,30 @@ jj git push --bookmark feat/short-topic     # new bookmarks push directly (no --
 Use Mode B for Conventional-Commit / ticket-prefixed branch names. Match the
 project's branch-naming rule.
 
+**Every commit you push needs a description — including ancestors.** jj rejects
+the whole push if *any* commit in the pushed range has no message, not just the
+bookmark target:
+
+```text
+jj bookmark create feat-x -r @-  → Warning: Target revision is empty.   (when @- is a bare `jj new`)
+jj git push --bookmark feat-x    → Error: Won't push commit <id> since it has no description
+                                   Hint: Rejected commit: vlsyutvw 445401e2 (no description set)
+```
+
+Verified: a bookmark on a *described* change still fails when an undescribed
+change sits between it and the trunk; describing that middle change makes the
+same push succeed. Two ways in — `@-` is a bare `jj new` (so the previous change
+was never described), or a stray undescribed change earlier in the stack.
+
+Check the whole range before pushing, not just the tip:
+
+```bash
+jj --no-pager log -r 'trunk()..@' -T 'change_id.short() ++ " [" ++ description.first_line() ++ "]\n"'
+```
+
+Any entry with empty brackets blocks the push — `jj describe -r <change-id> -m "…"`
+to fix it.
+
 ## Open the PR
 
 ```bash

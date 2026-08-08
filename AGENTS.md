@@ -22,6 +22,7 @@ remote, PR, CI, and audit interface.
 │       ├── detect_jj_state.sh       # git-only / jj-only / colocated / worktree-shadowed detection (tested)
 │       └── verify_handoff.sh        # final verification gate (tested)
 ├── tests/smoke_test.sh              # end-to-end proof against a real jj repo + remote
+├── tests/verify_jj_version.sh       # compatibility probe: re-checks every documented command on a new jj
 ├── docs/PRD.md                      # product requirements (living working document; R2 authoritative)
 ├── .claude-plugin/plugin.json       # plugin metadata
 ├── .github/workflows/               # CI: validate, release, auto-merge-deps
@@ -36,6 +37,8 @@ remote, PR, CI, and audit interface.
 - `bash skills/jujutsu-workflow/scripts/detect_jj_state.sh [--json]` — report repo VCS state.
 - `bash skills/jujutsu-workflow/scripts/verify_handoff.sh [--require-bookmark]` — handoff gate.
 - `bash tests/smoke_test.sh` — end-to-end proof (requires `jj` on PATH; uses a temp dir).
+- `bash tests/verify_jj_version.sh` — re-verify every documented jj command/flag/revset
+  against the installed jj; exit 1 on drift. Run before changing `compatibility` in SKILL.md.
 - `bash <skill-repo-skill>/skills/skill-repo/scripts/validate-skill.sh .` — validate repo structure.
 
 ## Rules
@@ -54,7 +57,8 @@ remote, PR, CI, and audit interface.
 
 - Follows the Netresearch skill-repo standard (split MIT + CC-BY-SA-4.0 licensing,
   reusable-workflow CI callers, no `composer.lock`).
-- All `jj` commands are verified against **jj 0.42.0** (`compatibility` in SKILL.md frontmatter).
+- All `jj` commands are verified against **jj 0.42.0** and re-verified against
+  **0.43.0** with no drift (`compatibility` in SKILL.md frontmatter).
 - No `agents/openai.yaml` (Netresearch house convention; OpenAI description derives from `SKILL.md`).
 
 ## References

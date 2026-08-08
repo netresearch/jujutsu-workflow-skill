@@ -115,6 +115,21 @@ else
   ng "handoff: feat-smoke not found on remote"
 fi
 
+# --- E2. push refuses an undescribed commit (the `@-` trap right after `jj new`) ---
+# `jj new` makes an empty undescribed change the working copy, so `@-` is the
+# PREVIOUS change. Bookmarking an undescribed one and pushing is rejected.
+jj new >/dev/null 2>&1 # empty, undescribed
+jj new >/dev/null 2>&1 # @- is now the empty undescribed change above
+jj bookmark create feat-undescribed -r @- >/dev/null 2>&1
+push_err="$(jj git push --bookmark feat-undescribed 2>&1)"
+if printf '%s' "$push_err" | grep -qi 'no description'; then
+  ok "push rejects an undescribed commit (documented in pr-handoff.md)"
+else
+  ng "expected 'no description' rejection, got: $(printf '%s' "$push_err" | head -1)"
+fi
+jj bookmark delete feat-undescribed >/dev/null 2>&1
+jj edit 'description(substring:"feat: unit two")' >/dev/null 2>&1
+
 # --- F. verify_handoff gate ---
 expect_exit "verify_handoff: ready on a feature bookmark" 0 "$VH" --bookmark feat-smoke --require-bookmark
 expect_exit "verify_handoff: FAILs when pushing a protected branch" 1 "$VH" --bookmark main --require-bookmark
