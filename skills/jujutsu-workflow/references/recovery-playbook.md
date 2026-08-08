@@ -87,6 +87,29 @@ shared workspace):
 jj workspace update-stale
 ```
 
+## "I ran jj from a shadowed worktree"
+
+If `detect_jj_state.sh` reports `worktree-shadowed` (exit 3) *after* you already ran
+jj commands there, those commands hit the **parent** repo, not your worktree. The
+damage is in the parent, and it can include the human's uncommitted work being
+committed under your message.
+
+```bash
+cd "$(jj root)"                     # the PARENT repo — where the damage is
+jj --no-pager op log --limit 10     # find the ops you caused, by your message
+jj undo                             # reverse the last one; repeat, or:
+jj op restore <op-id-before-yours>  # roll the parent back wholesale
+```
+
+Then go back to the worktree and use **git only**. Your worktree's own files were
+never touched by jj — `git status` there still shows them.
+
+Two things this does not cover: work already discarded via `ExitWorktree` with
+`discard_changes: true` (jj never recorded it, so no op exists), and a
+`jj git init --git-repo=…` run in a dirty worktree, which checks out over the
+working copy with no op-log entry. Both are unrecoverable — which is why
+[agent-safety.md](agent-safety.md) §7 forbids reaching that point.
+
 ## "I think I lost work"
 
 You almost certainly didn't — if a jj command ran after you edited the files, the
