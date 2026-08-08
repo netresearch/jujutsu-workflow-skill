@@ -18,6 +18,9 @@ was introduced in 0.3.1; the GitHub Releases for those tags remain the original 
 
 ## [0.3.1] - 2026-08-08
 
+Follows on from the worktree fix in 0.3.0 (#18): it was verified against jj 0.43.0
+while the skill still declared 0.42.0, and this release closes that mismatch.
+
 ### Added
 
 - `tests/verify_jj_version.sh` — a compatibility probe that re-checks every
@@ -43,6 +46,9 @@ was introduced in 0.3.1; the GitHub Releases for those tags remain the original 
   shell file in the repo now passes `shellcheck` and `shfmt`.
 
 ## [0.3.0] - 2026-08-08
+
+Reported by @plttn in #18 — including the `discard_changes: true` trap, which is
+what makes the state destructive rather than merely confusing.
 
 ### Added
 
