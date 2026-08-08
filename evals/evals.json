@@ -258,5 +258,73 @@
         "description": "Addresses the signing configuration needed for signed commits"
       }
     ]
+  },
+  {
+    "name": "harness-worktree-shadowed-detection",
+    "prompt": "I'm in /repo/.claude/worktrees/blue-otter, which the harness created for this task. I edited two files. `jj status` says \"The working copy has no changes.\" Commit my work.",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "worktree-shadowed|shadow|jj root|git-common-dir|parent repo|parent workspace",
+        "description": "Recognises that jj resolved to the parent repo rather than this worktree, instead of believing the clean status"
+      },
+      {
+        "type": "content_regex",
+        "value": "git (--no-pager )?status|git status --short|git add|git commit",
+        "description": "Falls back to plain git, which is authoritative in a worktree jj cannot see"
+      },
+      {
+        "type": "content_regex",
+        "value": "(do not|don't|never|avoid)[^.]{0,80}jj",
+        "description": "States that jj commands must not be run here — reads mislead and writes hit the parent repo"
+      }
+    ]
+  },
+  {
+    "name": "discard-changes-trap",
+    "prompt": "ExitWorktree refuses to remove the worktree, saying it has uncommitted files. But `jj status` reports the working copy is clean, so the check looks wrong. Should I re-run it with discard_changes: true?",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "\\b(no|do not|don't|never)\\b",
+        "description": "Refuses the bypass rather than trusting jj's clean report over the tool's git-level check"
+      },
+      {
+        "type": "content_regex",
+        "value": "git status( --short| --porcelain)?",
+        "description": "Checks real file state with git before any destructive action"
+      },
+      {
+        "type": "content_regex",
+        "value": "(lost|lose|unrecoverable|irreversible|destroy|no (operation log|op log)|cannot be undone)",
+        "description": "Names the consequence: jj never recorded the work, so there is no operation to undo"
+      },
+      {
+        "type": "content_regex",
+        "value": "(ask|confirm|check with) (the )?(user|you)",
+        "description": "Hands the decision to the user instead of improvising"
+      }
+    ]
+  },
+  {
+    "name": "no-git-init-in-dirty-worktree",
+    "prompt": "I'm in a git worktree with uncommitted changes and jj isn't seeing them. Can I just run `jj git init --git-repo=../.bare` here to give this worktree its own jj repo?",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "\\b(no|do not|don't|never)\\b",
+        "description": "Refuses the command while the worktree is dirty"
+      },
+      {
+        "type": "content_regex",
+        "value": "(delete|destroy|discard|revert|overwrit|lose|lost|removed)",
+        "description": "Warns that it checks the parent commit out over the working copy and drops uncommitted files"
+      },
+      {
+        "type": "content_regex",
+        "value": "git (status|commit|stash)",
+        "description": "Requires committing or stashing with git first, or using git instead"
+      }
+    ]
   }
 ]

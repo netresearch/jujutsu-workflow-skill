@@ -129,6 +129,42 @@ printf 'BBB\n' >conf.txt
 jj rebase -s @ -d "$sideA" >/dev/null 2>&1
 expect_exit "verify_handoff: FAILs on unresolved conflict" 1 "$VH"
 
+# --- G. harness-shadowed git worktree is detected, and jj is NOT trusted there ---
+# A git worktree inside the repo with no .jj/ of its own: jj walks up and answers
+# for the parent workspace. This is what Claude Code's EnterWorktree creates.
+git worktree add -q "$TMP/work/.claude/worktrees/harness" -b harness-wt 2>/dev/null
+if [[ -d "$TMP/work/.claude/worktrees/harness" ]]; then
+  (
+    cd "$TMP/work/.claude/worktrees/harness" || exit 2
+    printf 'edited in the worktree\n' >shadow.txt
+  )
+  smode="$(cd "$TMP/work/.claude/worktrees/harness" && "$DET" --json | sed -n 's/.*"mode":"\([^"]*\)".*/\1/p')"
+  check "detect_jj_state flags a harness worktree as shadowed" "$smode" "worktree-shadowed"
+
+  (cd "$TMP/work/.claude/worktrees/harness" && "$DET" >/dev/null 2>&1)
+  dexit=$?
+  check "detect_jj_state exits 3 in a shadowed worktree" "$dexit" "3"
+
+  # The whole point: jj reports clean here while git sees a real untracked file.
+  jjsees="$(cd "$TMP/work/.claude/worktrees/harness" && jj --no-pager status 2>/dev/null | grep -c 'shadow.txt')"
+  gitsees="$(cd "$TMP/work/.claude/worktrees/harness" && git status --porcelain 2>/dev/null | grep -c 'shadow.txt')"
+  if [[ "$jjsees" -eq 0 && "$gitsees" -ge 1 ]]; then
+    ok "shadowed worktree: jj misses the file git sees (jj=$jjsees, git=$gitsees) — git is authoritative"
+  else
+    ng "shadowed worktree: expected jj to miss it and git to see it (jj=$jjsees, git=$gitsees)"
+  fi
+
+  # working_copy must come from git, not from the parent workspace's jj status.
+  swc="$(cd "$TMP/work/.claude/worktrees/harness" && "$DET" --json | sed -n 's/.*"working_copy":"\([^"]*\)".*/\1/p')"
+  check "shadowed worktree: working_copy reported dirty from git" "$swc" "dirty"
+
+  # A normal (non-shadowed) checkout must not regress into the new mode.
+  nmode="$(cd "$TMP/work" && "$DET" --json | sed -n 's/.*"mode":"\([^"]*\)".*/\1/p')"
+  check "colocated root still detected as colocated" "$nmode" "colocated"
+else
+  ng "shadowed worktree: could not create the test worktree"
+fi
+
 echo "----------------------------------------"
 echo "smoke_test: $pass passed, $fail failed"
 [[ "$fail" -eq 0 ]]

@@ -11,7 +11,7 @@ metadata:
 
 # Jujutsu Workflow
 
-For agentic coding, **prefer `jj` (Jujutsu) over raw `git`** whenever a `.jj/` repo is present — it is the superior local change layer. Git stays the canonical remote/PR/CI/audit interface: mutate with `jj`, verify with read-only Git.
+**Prefer `jj` (Jujutsu) over raw `git`** whenever a `.jj/` repo is present. Git stays the canonical remote/PR/CI/audit interface: mutate with `jj`, verify with read-only Git.
 
 ## 1. Detect & gate first
 
@@ -20,12 +20,13 @@ Run `${CLAUDE_SKILL_DIR}/scripts/detect_jj_state.sh`, or check manually:
 - `.jj/` present → jj repo: use `jj`, never **mutating** raw `git`.
 - `.jj/` **and** `.git/` → colocated: mutate with `jj`, read with git, never touch the git index/staging.
 - only `.git/` → plain Git repo: do not introduce `jj` unless asked.
+- in a git worktree, `jj root` ≠ `git rev-parse --show-toplevel` → **shadowed** (exit 3): jj answers for the parent repo. Run no `jj`; use git, then ask.
 
 See [references/git-interop.md](references/git-interop.md).
 
 ## 2. Agent-safety rules (non-negotiable)
 
-- Always `--no-pager` on output commands; set `jj config set --user ui.paginate never`.
+- Always `--no-pager`, or set `jj config set --user ui.paginate never`.
 - Always `-m`. **Never** run editor/TUI forms — bare `jj describe|commit|squash`, `jj split` (interactive), `jj squash -i`, `jj resolve`, `jj diffedit` — they hang agents.
 - `jj` snapshots the working copy only when a jj command runs, **not** on every file write.
 
@@ -38,14 +39,14 @@ jj --no-pager status
 # edit files (snapshotted on the next jj command)
 jj --no-pager diff
 jj describe -m "<project-conventional message>"
-jj new -m "<next unit>"     # one change per logical unit — avoids one fat commit
+jj new -m "<next unit>"     # one change per logical unit
 ```
 
 Split a mixed change non-interactively: `jj split <path> -m "<msg>"`. See [references/command-map.md](references/command-map.md).
 
 ## 4. Recover (reversible)
 
-`jj --no-pager op log` → `jj undo` (last op) or `jj op restore <id>`. Conflicts are first-class: `jj status` flags them; resolve by editing markers, then verify. See [references/recovery-playbook.md](references/recovery-playbook.md).
+`jj --no-pager op log` → `jj undo` or `jj op restore <id>`. Conflicts are first-class: `jj status` flags them; resolve by editing markers, then verify. See [references/recovery-playbook.md](references/recovery-playbook.md).
 
 ## 5. Hand off via Git
 
@@ -64,6 +65,6 @@ One `jj workspace` per concurrent agent — never share a working copy. See [ref
 
 ## 7. Verify before "done"
 
-Run `${CLAUDE_SKILL_DIR}/scripts/verify_handoff.sh`, or report `jj --no-pager status`, `jj --no-pager log --limit 10`, `jj --no-pager diff --stat`, `git status --short --branch`. Report exact commands and output; never claim "done/tested/ready" without it; disclose force-pushes, recoveries, conflicts.
+Run `${CLAUDE_SKILL_DIR}/scripts/verify_handoff.sh`, or report `jj --no-pager status`, `jj --no-pager log --limit 10`, `jj --no-pager diff --stat`, `git status --short --branch`. Never claim "done/tested/ready" without that output; disclose force-pushes, recoveries, conflicts.
 
 **When jj helps, and when it doesn't**: [references/why-jj-for-agents.md](references/why-jj-for-agents.md).

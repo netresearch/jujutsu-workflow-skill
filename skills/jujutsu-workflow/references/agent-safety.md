@@ -92,7 +92,33 @@ For signed commits, configure signing in jj config (`signing.behavior = "own"`,
 `signing.backend = "ssh"` or `"gpg"`); jj signs commits it creates. Confirm the
 project's signing requirement before pushing.
 
-## 7. Verify after every mutation
+## 7. A harness worktree shadows the jj repo
+
+You may be placed in a plain git worktree before you get a say — Claude Code's
+`EnterWorktree`, `--worktree`, `isolation: "worktree"`, and background sessions all
+create one at `.claude/worktrees/<name>` **inside** the repo. It has no `.jj/`, so
+jj walks up and answers for the parent repo instead.
+
+Detect it before trusting any jj output:
+
+```bash
+detect_jj_state.sh      # mode: worktree-shadowed, exit 3
+```
+
+**Rule: in this state run no jj command at all — reads included.** `jj status`
+reports the parent workspace (it printed "The working copy has no changes." over a
+modified and an untracked file), and `jj describe` committed the *parent
+checkout's* unrelated work under the agent's message. Use plain git here; it is
+the correct tool, not a fallback.
+
+**Never resolve an `ExitWorktree` refusal with `discard_changes: true` on jj's
+word.** That check reads real git file state and is correct; jj's "clean" is not
+evidence. Run `git status --short`; if it lists anything, stop and ask. Nothing
+recovers this — jj never recorded the work, so there is no op to undo. Full
+detail, including how to prevent the situation, in
+[git-interop.md](git-interop.md).
+
+## 8. Verify after every mutation
 
 `jj` operations are quiet on success. After `squash`/`split`/`rebase`/`abandon`,
 run `jj --no-pager status` and `jj --no-pager log --limit 5` to confirm the result

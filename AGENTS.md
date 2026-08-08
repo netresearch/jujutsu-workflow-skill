@@ -19,7 +19,7 @@ remote, PR, CI, and audit interface.
 │   │   ├── parallel-agents.md       # workspaces; absorption & bundling mitigations
 │   │   └── why-jj-for-agents.md     # decision guide: when jj helps + when not to use it
 │   └── scripts/
-│       ├── detect_jj_state.sh       # git-only / jj-only / colocated detection (tested)
+│       ├── detect_jj_state.sh       # git-only / jj-only / colocated / worktree-shadowed detection (tested)
 │       └── verify_handoff.sh        # final verification gate (tested)
 ├── tests/smoke_test.sh              # end-to-end proof against a real jj repo + remote
 ├── docs/PRD.md                      # product requirements (living working document; R2 authoritative)
@@ -42,7 +42,9 @@ remote, PR, CI, and audit interface.
 
 1. **`jj` for local mutation, Git for the external contract.** Mutate with `jj`;
    use Git read-only for verification.
-2. **Detect repo state before mutating** (`git-only` / `jj-only` / `colocated` / `none`).
+2. **Detect repo state before mutating** (`git-only` / `jj-only` / `colocated` /
+   `worktree-shadowed` / `none`). `worktree-shadowed` exits 3: a harness-created git
+   worktree under a jj repo, where jj answers for the parent — run no `jj` there.
 3. **Agent-safety is non-negotiable:** `--no-pager`, always `-m`, never editor/TUI forms.
 4. **Never push to protected/default branches; never rewrite public history** unless allowed.
 5. **Recover with the operation log** (`jj op log`, `jj undo`, `jj op restore`) before destructive Git recovery.
