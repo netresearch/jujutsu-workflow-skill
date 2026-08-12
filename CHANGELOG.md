@@ -16,6 +16,12 @@ was introduced in 0.3.1; the GitHub Releases for those tags remain the original 
 
 ### Fixed
 
+## [0.3.2] - 2026-08-12
+
+### Changed
+
+- Credit the reporter of the 0.3.0 worktree issue (#18) in the 0.3.1 notes
+
 ## [0.3.1] - 2026-08-08
 
 Follows on from the worktree fix in 0.3.0 (#18): it was verified against jj 0.43.0
@@ -103,7 +109,8 @@ what makes the state destructive rather than merely confusing.
 - Netresearch governance ruleset: security and PR-quality workflows,
   `ARCHITECTURE.md`, split MIT + CC-BY-SA-4.0 licensing.
 
-[Unreleased]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v0.3.2...HEAD
+[0.3.2]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v0.1.0...v0.2.0
