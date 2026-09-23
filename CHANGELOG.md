@@ -10,6 +10,8 @@ was introduced in 0.3.1; the GitHub Releases for those tags remain the original 
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-09-23
+
 ### Changed
 
 - First stable release. From 1.0.0 on, an incompatible change to what this plugin exposes — skill names, trigger descriptions, the arguments and output of its scripts — ships only in a new major version.
@@ -132,7 +134,8 @@ what makes the state destructive rather than merely confusing.
 - Netresearch governance ruleset: security and PR-quality workflows,
   `ARCHITECTURE.md`, split MIT + CC-BY-SA-4.0 licensing.
 
-[Unreleased]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v0.3.4...HEAD
+[Unreleased]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v0.3.4...v1.0.0
 [0.3.4]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v0.3.1...v0.3.2
