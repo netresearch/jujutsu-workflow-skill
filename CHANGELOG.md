@@ -10,6 +10,10 @@ was introduced in 0.3.1; the GitHub Releases for those tags remain the original 
 
 ## [Unreleased]
 
+### Changed
+
+- First stable release. From 1.0.0 on, an incompatible change to what this plugin exposes — skill names, trigger descriptions, the arguments and output of its scripts — ships only in a new major version.
+
 ## [0.3.4] - 2026-09-11
 
 ### Added
