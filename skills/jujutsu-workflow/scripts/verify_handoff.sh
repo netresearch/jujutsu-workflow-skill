@@ -5,8 +5,8 @@
 #
 # Checks (in a jj repo):
 #   - unresolved conflicts present                         -> FAIL
-#   - a protected/default branch is the bookmark at @      -> FAIL (no direct push)
-#   - --require-bookmark set but no bookmark points at @   -> FAIL
+#   - a protected/default branch is a push target          -> FAIL (no direct push)
+#   - --require-bookmark set but no non-protected target   -> FAIL
 #   - working copy still has an undescribed change         -> WARN (FAIL with --strict)
 #
 # Exit: 0 = ready, 1 = not ready (a check failed), 2 = bad usage.
@@ -54,7 +54,8 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     -h | --help)
-      sed -n '2,21p' "$0"
+      # The header comment block after the shebang, without licence lines.
+      awk 'NR == 1 { next } /^#/ { if ($0 !~ /SPDX-/) print; next } { exit }' "$0"
       exit 0
       ;;
     *)

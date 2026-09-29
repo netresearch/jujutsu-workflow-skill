@@ -23,7 +23,8 @@ case "${1:-}" in
   --json) json=true ;;
   "") ;;
   -h | --help)
-    sed -n '2,16p' "$0"
+    # The header comment block after the shebang, without licence lines.
+    awk 'NR == 1 { next } /^#/ { if ($0 !~ /SPDX-/) print; next } { exit }' "$0"
     exit 0
     ;;
   *)

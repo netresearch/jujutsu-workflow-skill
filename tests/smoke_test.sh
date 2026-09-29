@@ -186,6 +186,13 @@ else
   ng "shadowed worktree: could not create the test worktree"
 fi
 
+# --- H. --help prints the whole header comment and nothing else ---
+dhelp="$("$DET" --help 2>&1)"
+vhelp="$("$VH" --help 2>&1)"
+check "detect_jj_state --help ends with the 'none' mode" "$(tail -1 <<<"$dhelp" | grep -c '^#   none ')" "1"
+check "verify_handoff --help ends with the candidates note" "$(tail -1 <<<"$vhelp" | grep -c 'Without it, candidates')" "1"
+check "--help prints no code or licence lines" "$(grep -cE 'set -uo|SPDX-' <<<"$dhelp$vhelp")" "0"
+
 echo "----------------------------------------"
 echo "smoke_test: $pass passed, $fail failed"
 [[ "$fail" -eq 0 ]]
