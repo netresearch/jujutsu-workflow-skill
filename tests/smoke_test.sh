@@ -133,6 +133,12 @@ jj edit 'description(substring:"feat: unit two")' >/dev/null 2>&1
 # --- F. verify_handoff gate ---
 expect_exit "verify_handoff: ready on a feature bookmark" 0 "$VH" --bookmark feat-smoke --require-bookmark
 expect_exit "verify_handoff: FAILs when pushing a protected branch" 1 "$VH" --bookmark main --require-bookmark
+# An option without its value is a usage error (exit 2), not an endless loop;
+# `timeout` turns a regression into exit 124 instead of a hung test run.
+tmo=()
+command -v timeout >/dev/null 2>&1 && tmo=(timeout 10)
+expect_exit "verify_handoff: --bookmark without a value is a usage error" 2 ${tmo[@]+"${tmo[@]}"} "$VH" --bookmark
+expect_exit "verify_handoff: --protected without a value is a usage error" 2 ${tmo[@]+"${tmo[@]}"} "$VH" --require-bookmark --protected
 
 # force a conflict and confirm the gate blocks it
 base="$(jj --no-pager log --no-graph -r '@' -T 'change_id' 2>/dev/null)"

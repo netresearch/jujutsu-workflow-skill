@@ -27,12 +27,18 @@ json=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --protected)
-      protected="${2:-}"
-      shift 2
-      ;;
-    --bookmark)
-      bookmark="${2:-}"
+    --protected | --bookmark)
+      # A missing value would make `shift 2` fail without shifting, and the
+      # loop would never end.
+      if [[ $# -lt 2 ]]; then
+        echo "error: $1 needs a value" >&2
+        exit 2
+      fi
+      if [[ "$1" == --protected ]]; then
+        protected="$2"
+      else
+        bookmark="$2"
+      fi
       shift 2
       ;;
     --require-bookmark)
