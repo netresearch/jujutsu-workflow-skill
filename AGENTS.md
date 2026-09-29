@@ -73,3 +73,4 @@ remote, PR, CI, and audit interface.
 
 - [SKILL.md](skills/jujutsu-workflow/SKILL.md) — skill runtime instructions and the 7 reference docs.
 - [docs/PRD.md](docs/PRD.md) — product requirements (Revision 2 is authoritative) and competitive analysis.
+- [docs/SECURITY-ASSURANCE.md](docs/SECURITY-ASSURANCE.md) — security assurance case: trust boundaries, threats, countermeasures and limits.
