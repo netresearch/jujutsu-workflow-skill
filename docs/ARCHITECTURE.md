@@ -32,13 +32,14 @@ Progressive-disclosure detail, loaded on demand:
 
 Tested, shellcheck-clean helpers the skill invokes via `${CLAUDE_SKILL_DIR}`:
 
-- **[detect_jj_state.sh](../skills/jujutsu-workflow/scripts/detect_jj_state.sh)** — classifies the repo as `git-only` / `jj-only` / `colocated` / `none`.
+- **[detect_jj_state.sh](../skills/jujutsu-workflow/scripts/detect_jj_state.sh)** — classifies the repo as `git-only` / `jj-only` / `colocated` / `worktree-shadowed` / `none`; exits 3 for `worktree-shadowed` (a git worktree under a jj repo, where jj answers for the parent).
 - **[verify_handoff.sh](../skills/jujutsu-workflow/scripts/verify_handoff.sh)** — the final handoff gate (conflicts, protected branch, bookmark presence).
 
 ### Evals / proof ([`tests/`](../tests/))
 
 - **[smoke_test.sh](../tests/smoke_test.sh)** — end-to-end proof that the documented workflow works in a real colocated repo + remote.
 - **[superiority_evals.sh](../tests/superiority_evals.sh)** — paired jj-vs-git scenarios that demonstrate jj's concrete advantages.
+- **[verify_jj_version.sh](../tests/verify_jj_version.sh)** — re-checks every documented jj command, flag and revset against the installed jj; run by hand before changing `compatibility` in SKILL.md, not in CI.
 
 [`.github/workflows/evals.yml`](../.github/workflows/evals.yml) installs the pinned
 jj version and runs both suites in CI, so the proof is continuous.
