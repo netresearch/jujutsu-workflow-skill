@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Netresearch DTT GmbH
 {
   // docs/PRD.md is an imported, verbatim working document (a living PRD), not
   // authored skill content — it is not linted as such.

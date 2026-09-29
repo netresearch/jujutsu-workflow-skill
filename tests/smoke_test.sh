@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 # smoke_test.sh — end-to-end proof that the jujutsu-workflow skill's instructions
 # actually work against a real jj repo + Git remote. Asserts the behaviors the
 # SKILL.md and references claim.

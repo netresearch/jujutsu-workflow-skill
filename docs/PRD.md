@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 > **Status:** Working document (living PRD). **Revision 2** below is the
 > authoritative spec; **Revision 1** (the original spec) follows for history. R2
 > was produced after (a) verifying every command hands-on against `jj 0.42.0`, and

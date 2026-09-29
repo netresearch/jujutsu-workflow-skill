@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # PR handoff — turn a jj change into a reviewable Git PR
 
 Git is the contract with the outside world. The agent's deliverable is a clean,

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 # detect_jj_state.sh — Report the version-control state of the current directory
 # so an agent can pick the right workflow (jj vs Git, colocated or not).
 #

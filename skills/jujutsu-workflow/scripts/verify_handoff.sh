@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 # verify_handoff.sh — Final verification gate before an agent claims a jj change
 # is ready to hand off. Prints the canonical jj + Git state and FAILS (exit 1)
 # if the change is not safe to hand off.
