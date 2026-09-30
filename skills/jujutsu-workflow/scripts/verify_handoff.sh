@@ -32,10 +32,18 @@ while [[ $# -gt 0 ]]; do
     --protected | --bookmark)
       # A missing value would make `shift 2` fail without shifting, and the
       # loop would never end.
+      # A recognised option in the value position is a missing value too:
+      # `--protected --strict` would otherwise take `--strict` as the list.
       if [[ $# -lt 2 ]]; then
         echo "error: $1 needs a value" >&2
         exit 2
       fi
+      case "$2" in
+        --protected | --bookmark | --require-bookmark | --strict | --json | -h | --help)
+          echo "error: $1 needs a value" >&2
+          exit 2
+          ;;
+      esac
       if [[ "$1" == --protected ]]; then
         protected="$2"
       else

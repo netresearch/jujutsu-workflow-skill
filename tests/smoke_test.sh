@@ -141,6 +141,7 @@ tmo=()
 command -v timeout >/dev/null 2>&1 && tmo=(timeout 10)
 expect_exit "verify_handoff: --bookmark without a value is a usage error" 2 ${tmo[@]+"${tmo[@]}"} "$VH" --bookmark
 expect_exit "verify_handoff: --protected without a value is a usage error" 2 ${tmo[@]+"${tmo[@]}"} "$VH" --require-bookmark --protected
+expect_exit "verify_handoff: an option in the value position is a usage error" 2 ${tmo[@]+"${tmo[@]}"} "$VH" --protected --strict --bookmark main --require-bookmark
 
 # force a conflict and confirm the gate blocks it
 base="$(jj --no-pager log --no-graph -r '@' -T 'change_id' 2>/dev/null)"
