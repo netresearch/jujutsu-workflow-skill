@@ -51,8 +51,8 @@ The repository ships no server component, no container image and no compiled cod
 | A documented jj command stops working on a new jj release | CI runs both suites against the pinned jj version; `verify_jj_version.sh` re-checks every documented command, flag and revset before `compatibility` in `SKILL.md` is changed | `.github/workflows/evals.yml`, `tests/verify_jj_version.sh` |
 | A released archive is tampered with | The release workflow publishes a Cosign-signed `SHA256SUMS.txt` and build-provenance attestations for the archives | `.github/workflows/release.yml` (calls the skill-repo-skill release reusable) |
 | A secret is committed | Betterleaks scans every push to `main` and every pull request to `main` | `.github/workflows/security.yml` |
-| A vulnerable or malicious dependency is added | Dependency review fails on vulnerabilities of severity high or above in a pull request; Composer Audit checks the Composer dependency (`netresearch/composer-agent-skill-plugin`) against known advisories; Renovate proposes updates | `.github/workflows/security.yml`, `composer.json`, `renovate.json` |
-| Insecure code or workflow patterns | Opengrep fails on findings of severity WARNING or above; zizmor analyses the workflows; ShellCheck runs on every `*.sh` file in Skill Validation | `.github/workflows/security.yml`, `.github/workflows/lint.yml` |
+| A vulnerable or malicious dependency is added | Dependency review checks the dependencies a pull request adds or changes against known vulnerabilities; Composer Audit checks the Composer dependency (`netresearch/composer-agent-skill-plugin`) against known advisories; Renovate proposes updates | `.github/workflows/security.yml`, `composer.json`, `renovate.json` |
+| Insecure code or workflow patterns | Opengrep scans the code for insecure patterns; zizmor analyses the workflows; ShellCheck runs on every `*.sh` file in Skill Validation | `.github/workflows/security.yml`, `.github/workflows/lint.yml` |
 
 Which of these checks must pass before a pull request can merge is set in the branch protection of `main`, not in this repository.
 
