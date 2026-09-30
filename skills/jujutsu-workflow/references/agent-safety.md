@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # Agent safety — what hangs an agent, and how to avoid it
 
 The single biggest failure mode of `jj` inside an agent is **blocking on

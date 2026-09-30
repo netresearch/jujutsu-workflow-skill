@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # Git interop — detection, colocation, and staying compatible
 
 `jj` is Git-backed. The agent's job is to use jj's strengths locally while leaving

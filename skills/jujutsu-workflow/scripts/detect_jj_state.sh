@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 # detect_jj_state.sh — Report the version-control state of the current directory
 # so an agent can pick the right workflow (jj vs Git, colocated or not).
 #
@@ -23,7 +25,8 @@ case "${1:-}" in
   --json) json=true ;;
   "") ;;
   -h | --help)
-    sed -n '2,16p' "$0"
+    # The header comment block after the shebang, without licence lines.
+    awk 'NR == 1 { next } /^#/ { if ($0 !~ /SPDX-/) print; next } { exit }' "$0"
     exit 0
     ;;
   *)

@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # AGENTS.md — jujutsu-workflow-skill
 
 Agent-safe version-control workflows using Jujutsu (`jj`) with Git-backed
@@ -21,11 +24,15 @@ remote, PR, CI, and audit interface.
 │   └── scripts/
 │       ├── detect_jj_state.sh       # git-only / jj-only / colocated / worktree-shadowed detection (tested)
 │       └── verify_handoff.sh        # final verification gate (tested)
+├── evals/evals.json                 # skill evaluation cases (Eval Validation)
 ├── tests/smoke_test.sh              # end-to-end proof against a real jj repo + remote
+├── tests/superiority_evals.sh       # paired jj-vs-git scenarios (run in CI by evals.yml)
 ├── tests/verify_jj_version.sh       # compatibility probe: re-checks every documented command on a new jj
 ├── docs/PRD.md                      # product requirements (living working document; R2 authoritative)
+├── docs/ARCHITECTURE.md             # components and design decisions
+├── plugin.json                      # plugin metadata (source of truth, synced to .claude-plugin/)
 ├── .claude-plugin/plugin.json       # plugin metadata
-├── .github/workflows/               # CI: validate, release, auto-merge-deps
+├── .github/workflows/               # CI: lint, evals, eval/harness validation, security, release, …
 ├── composer.json / package.json     # PHP / Node distribution
 ├── renovate.json                    # dependency automation
 ├── LICENSE-MIT / LICENSE-CC-BY-SA-4.0
@@ -37,6 +44,7 @@ remote, PR, CI, and audit interface.
 - `bash skills/jujutsu-workflow/scripts/detect_jj_state.sh [--json]` — report repo VCS state.
 - `bash skills/jujutsu-workflow/scripts/verify_handoff.sh [--require-bookmark]` — handoff gate.
 - `bash tests/smoke_test.sh` — end-to-end proof (requires `jj` on PATH; uses a temp dir).
+- `bash tests/superiority_evals.sh` — jj-vs-git scenarios (requires `jj` on PATH; uses a temp dir).
 - `bash tests/verify_jj_version.sh` — re-verify every documented jj command/flag/revset
   against the installed jj; exit 1 on drift. Run before changing `compatibility` in SKILL.md.
 - `bash <skill-repo-skill>/skills/skill-repo/scripts/validate-skill.sh .` — validate repo structure.
@@ -65,3 +73,4 @@ remote, PR, CI, and audit interface.
 
 - [SKILL.md](skills/jujutsu-workflow/SKILL.md) — skill runtime instructions and the 7 reference docs.
 - [docs/PRD.md](docs/PRD.md) — product requirements (Revision 2 is authoritative) and competitive analysis.
+- [docs/SECURITY-ASSURANCE.md](docs/SECURITY-ASSURANCE.md) — security assurance case: trust boundaries, threats, countermeasures and limits.

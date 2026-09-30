@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # Parallel agents & avoiding jj's documented failure modes
 
 A team that adopted jj for agents and then **removed it** (the field report behind

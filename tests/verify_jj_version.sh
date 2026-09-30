@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 # verify_jj_version.sh — Re-check every jj command, flag and revset this skill
 # claims against the jj on PATH. Run it when bumping the `compatibility` field in
 # SKILL.md, or when a new jj release lands.

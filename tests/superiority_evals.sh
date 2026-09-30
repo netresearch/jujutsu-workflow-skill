@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 # superiority_evals.sh — PROOF that jj is superior to pure Git for agentic coding.
 #
 # Each scenario runs the SAME agentic situation two ways and asserts that jj has

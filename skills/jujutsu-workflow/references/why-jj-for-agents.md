@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # jj vs Git: when it helps, when it doesn't
 
 A decision guide, not a sales pitch. Each "use jj when" bullet points to the

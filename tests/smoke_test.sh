@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 # smoke_test.sh — end-to-end proof that the jujutsu-workflow skill's instructions
 # actually work against a real jj repo + Git remote. Asserts the behaviors the
 # SKILL.md and references claim.
@@ -133,6 +135,13 @@ jj edit 'description(substring:"feat: unit two")' >/dev/null 2>&1
 # --- F. verify_handoff gate ---
 expect_exit "verify_handoff: ready on a feature bookmark" 0 "$VH" --bookmark feat-smoke --require-bookmark
 expect_exit "verify_handoff: FAILs when pushing a protected branch" 1 "$VH" --bookmark main --require-bookmark
+# An option without its value is a usage error (exit 2), not an endless loop;
+# `timeout` turns a regression into exit 124 instead of a hung test run.
+tmo=()
+command -v timeout >/dev/null 2>&1 && tmo=(timeout 10)
+expect_exit "verify_handoff: --bookmark without a value is a usage error" 2 ${tmo[@]+"${tmo[@]}"} "$VH" --bookmark
+expect_exit "verify_handoff: --protected without a value is a usage error" 2 ${tmo[@]+"${tmo[@]}"} "$VH" --require-bookmark --protected
+expect_exit "verify_handoff: an option in the value position is a usage error" 2 ${tmo[@]+"${tmo[@]}"} "$VH" --protected --strict --bookmark main --require-bookmark
 
 # force a conflict and confirm the gate blocks it
 base="$(jj --no-pager log --no-graph -r '@' -T 'change_id' 2>/dev/null)"
@@ -179,6 +188,13 @@ if [[ -d "$TMP/work/.claude/worktrees/harness" ]]; then
 else
   ng "shadowed worktree: could not create the test worktree"
 fi
+
+# --- H. --help prints the whole header comment and nothing else ---
+dhelp="$("$DET" --help 2>&1)"
+vhelp="$("$VH" --help 2>&1)"
+check "detect_jj_state --help ends with the 'none' mode" "$(tail -1 <<<"$dhelp" | grep -c '^#   none ')" "1"
+check "verify_handoff --help ends with the candidates note" "$(tail -1 <<<"$vhelp" | grep -c 'Without it, candidates')" "1"
+check "--help prints no code or licence lines" "$(grep -cE 'set -uo|SPDX-' <<<"$dhelp$vhelp")" "0"
 
 echo "----------------------------------------"
 echo "smoke_test: $pass passed, $fail failed"
