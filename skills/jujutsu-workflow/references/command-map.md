@@ -1,10 +1,10 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 <!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
 
-# Command map — Git habits → jj (verified against jj 0.42.0 and 0.43.0)
+# Command map — Git habits → jj (verified against jj 0.42.0, 0.43.0, and 0.46.0)
 
 All commands below were run hands-on against jj 0.42.0 and re-run against 0.43.0
-with no drift. jj's CLI moves fast; on another version, confirm a flag with
+and 0.46.0 with no drift. jj's CLI moves fast; on another version, confirm a flag with
 `jj <cmd> --help`.
 
 ## Translation table

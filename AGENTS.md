@@ -66,7 +66,7 @@ remote, PR, CI, and audit interface.
 - Follows the Netresearch skill-repo standard (split MIT + CC-BY-SA-4.0 licensing,
   reusable-workflow CI callers, no `composer.lock`).
 - All `jj` commands are verified against **jj 0.42.0** and re-verified against
-  **0.43.0** with no drift (`compatibility` in SKILL.md frontmatter).
+  **0.43.0** and **0.46.0** with no drift (`compatibility` in SKILL.md frontmatter).
 - No `agents/openai.yaml` (Netresearch house convention; OpenAI description derives from `SKILL.md`).
 
 ## References

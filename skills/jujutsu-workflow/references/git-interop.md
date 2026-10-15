@@ -13,7 +13,7 @@ of five modes:
 
 | Mode | Signal | What to do |
 | --- | --- | --- |
-| `colocated` | `.jj/` and a real `.git/` at the root | mutate with jj; read-only git is fine |
+| `colocated` | `.jj/` and a `.git` at the root (a directory, or a worktree file in a jj 0.46+ workspace) | mutate with jj; read-only git is fine |
 | `jj-only` | `.jj/` present; git backend lives in `.jj/repo/store/git` | use jj; raw git CLI will not see repo state |
 | `git-only` | a Git repo, no `.jj/` | use Git; introduce jj only if asked |
 | `worktree-shadowed` | a git worktree with no `.jj/` of its own, under a jj repo | **do not run jj at all** — see below |
@@ -21,9 +21,10 @@ of five modes:
 
 `worktree-shadowed` exits **3**, not 0. Treat that exit code as a stop sign.
 
-Authoritative colocation check: `jj git colocation status`. In jj 0.42 and 0.43,
+Authoritative colocation check: `jj git colocation status`. Since jj 0.42,
 `jj git init` is **colocated by default** (`--no-colocate` opts out), so most jj
-repos an agent meets are colocated.
+repos an agent meets are colocated. Since jj 0.46, `jj workspace add` in a
+colocated repo is colocated too (see Worktrees → workspaces).
 
 ## Harness-provided git worktrees (`worktree-shadowed`)
 
@@ -40,7 +41,9 @@ Detect by structure, not by path — other harnesses use other directories:
 [ "$(jj root)" != "$(git rev-parse --show-toplevel)" ]                                              # jj points elsewhere
 ```
 
-Both true → shadowed. What that costs you, all observed on jj 0.43:
+Both true → shadowed. A jj 0.46+ workspace is also a linked worktree, but it has
+its own `.jj/`, so `jj root` equals Git's toplevel and it is colocated, not
+shadowed. What shadowing costs you, all observed on jj 0.43:
 
 - **Reads lie.** `jj status` in a worktree with modified and untracked files
   prints `The working copy has no changes.`
@@ -167,14 +170,23 @@ echo '.jj/' >> "$(git rev-parse --git-path info/exclude)"   # local exclude
 
 ## Worktrees → workspaces
 
-Do **not** use `git worktree` in a jj repo. jj's equivalent is workspaces, which
-share one operation log and avoid the colocation hazards of a second git worktree:
+Create extra working copies with `jj workspace add`, never `git worktree add`.
+Workspaces share one operation log, and jj manages any Git worktree they need:
 
 ```bash
 jj workspace add ../feature-ws        # new working copy, same repo
 jj workspace list
 jj workspace forget <name>            # remove BEFORE deleting the directory
 ```
+
+Since jj 0.46, `jj workspace add` in a colocated repo also creates a matching
+Git worktree: the workspace gets a `.git` file pointing at
+`<main>/.git/worktrees/<name>`, with Git's `HEAD` detached at `@-` as in the
+main checkout. Git-reading tools (`gh`, `git merge-base`, linters that find the
+project through `.git`) work there; apply the colocated rules above.
+`jj workspace forget` removes that Git worktree and its `.git` file; delete the
+directory after. Convert a workspace that `jj git colocation status` reports
+as not colocated with `jj git colocation enable`.
 
 See [parallel-agents.md](parallel-agents.md). If a higher-level skill suggests a
 git worktree for isolation, use a jj workspace instead — and if the harness

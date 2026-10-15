@@ -287,6 +287,52 @@ claim "jj workspace add" "jj workspace add FAILED" jj workspace add "$T/ws2"
 claim "jj workspace list" "jj workspace list FAILED" jj --no-pager workspace list
 claim "jj workspace forget" "jj workspace forget FAILED" jj workspace forget ws2
 
+# ---------- workspace colocation (git-interop.md, parallel-agents.md) ----------
+# jj 0.46 gave `jj workspace add` --colocate/--no-colocate: in a colocated repo a
+# new workspace gets a matching Git worktree. Older jj creates a bare jj
+# workspace with no .git at all. The flag decides which set of claims applies.
+if hasflag workspace add -- --colocate; then
+  jj workspace add --name wsc "$T/wsc" >/dev/null 2>&1
+  claim_bool "colocated workspace gets a .git file" \
+    "colocated workspace has no .git file (git-interop.md says it does)" \
+    "$(yn test -f "$T/wsc/.git")"
+  claim_bool "the .git file points into the main repo's .git/worktrees/" \
+    "workspace .git no longer points at <main>/.git/worktrees/<name>" \
+    "$(grep -q '\.git/worktrees/wsc' "$T/wsc/.git" 2>/dev/null && echo true || echo false)"
+  ws_head="$(git -C "$T/wsc" rev-parse HEAD 2>/dev/null)"
+  ws_parent="$(cd "$T/wsc" && jj --no-pager log --no-graph -r @- -T commit_id 2>/dev/null)"
+  ws_symref="$(git -C "$T/wsc" symbolic-ref -q HEAD 2>/dev/null)"
+  claim_bool "workspace Git HEAD is detached at @-" \
+    "workspace Git HEAD is attached to a branch or no longer matches @-" \
+    "$([[ -z "$ws_symref" && -n "$ws_head" && "$ws_head" == "$ws_parent" ]] && echo true || echo false)"
+  ws_top="$(cd "$T/wsc" && git rev-parse --show-toplevel 2>/dev/null)"
+  ws_root="$(cd "$T/wsc" && jj root 2>/dev/null)"
+  claim_bool "workspace Git toplevel equals jj root (not shadowed)" \
+    "workspace Git toplevel differs from jj root (detect_jj_state would call it shadowed)" \
+    "$([[ -n "$ws_root" && "$ws_top" == "$ws_root" ]] && echo true || echo false)"
+  jj workspace forget wsc >/dev/null 2>&1
+  wt_list="$(git worktree list --porcelain 2>/dev/null)"
+  claim_bool "jj workspace forget removes the Git worktree" \
+    "jj workspace forget leaves the Git worktree behind" \
+    "$(! grep -q "$T/wsc\$" <<<"$wt_list" && ! test -e "$T/wsc/.git" && echo true || echo false)"
+
+  jj workspace add --no-colocate --name wsn "$T/wsn" >/dev/null 2>&1
+  claim_bool "jj workspace add --no-colocate creates no .git" \
+    "jj workspace add --no-colocate now creates a .git" \
+    "$(yn test ! -e "$T/wsn/.git")"
+  (cd "$T/wsn" && jj git colocation enable >/dev/null 2>&1)
+  claim_bool "jj git colocation enable converts a non-colocated workspace" \
+    "jj git colocation enable no longer converts a workspace" \
+    "$(yn test -f "$T/wsn/.git")"
+  jj workspace forget wsn >/dev/null 2>&1
+else
+  jj workspace add "$T/wsold" >/dev/null 2>&1
+  claim_bool "pre-0.46 jj workspace add creates no .git" \
+    "pre-0.46 jj workspace add created a .git" \
+    "$(yn test ! -e "$T/wsold/.git")"
+  jj workspace forget wsold >/dev/null 2>&1
+fi
+
 echo "=================================================="
 echo "verify_jj_version: $ok claims hold, $drift drifted"
 [[ "$drift" -eq 0 ]]

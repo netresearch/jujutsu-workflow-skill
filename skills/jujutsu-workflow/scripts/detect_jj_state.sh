@@ -12,7 +12,7 @@
 # Usage: detect_jj_state.sh [--json]
 #
 # MODE is one of: colocated | jj-only | git-only | worktree-shadowed | none
-#   colocated        : .jj/ and a working .git/ at the same root -> mutate with jj, read with git
+#   colocated        : .jj/ and a .git (dir, or jj 0.46+ workspace file) at the same root -> mutate with jj, read with git
 #   jj-only          : .jj/ present, git backend lives inside .jj/ -> use jj; raw git will not see state
 #   git-only         : a Git repo, no .jj/ -> use Git; do not introduce jj unless asked
 #   worktree-shadowed: a git worktree with no .jj/ of its own, under a jj repo -> jj answers
@@ -97,8 +97,9 @@ if have jj; then
   fi
 fi
 
-# Mode + colocation. A colocated repo has a real .git/ at the workspace root;
-# a non-colocated jj repo keeps its Git backend inside .jj/.
+# Mode + colocation. A colocated repo has a .git at the workspace root: a
+# directory, or in a jj 0.46+ workspace a file pointing into the main repo's
+# .git/worktrees/. A non-colocated jj repo keeps its Git backend inside .jj/.
 #
 # Checked FIRST: a git worktree with no .jj/ of its own, sitting under a jj repo.
 # jj walks up, finds the parent's .jj/ and answers for the PARENT workspace --

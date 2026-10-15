@@ -13,6 +13,16 @@ was introduced in 0.3.1; the GitHub Releases for those tags remain the original 
 
 ## [Unreleased]
 
+### Added
+
+- `verify_jj_version.sh` claims for jj 0.46 workspace colocation: a new workspace in a colocated repo gets a `.git` file under the main repo's `.git/worktrees/`, its Git `HEAD` sits at `@-`, `jj workspace forget` removes the Git worktree, and `jj git colocation enable` converts a `--no-colocate` workspace. On older jj the probe asserts a workspace gets no `.git`
+- Smoke test: `detect_jj_state.sh` reports a jj 0.46+ workspace as `colocated`, not `worktree-shadowed` (skipped on older jj)
+
+### Changed
+
+- git-interop: a jj 0.46+ workspace counts as colocated; the workspace section covers its Git worktree, cleanup with `jj workspace forget`, and `jj git colocation enable`
+- Compatibility re-verified on jj 0.46.0 with no drift
+
 ## [1.0.0] - 2026-09-23
 
 ### Changed

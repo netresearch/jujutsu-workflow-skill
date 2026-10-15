@@ -4,7 +4,7 @@
 name: jujutsu-workflow
 description: "Use when a coding agent works in a repository where Jujutsu (jj) is available (a `.jj/` directory) — running jj commands, making speculative edits, splitting changes, recovering with the operation log (jj undo / jj op restore), handing off a PR to Git/GitHub/GitLab, updating a PR after review, or coordinating parallel agents. Uses jj as the local change-management layer while keeping Git as the canonical remote, PR, CI, and audit interface. Also use to avoid jj's agent footguns (pager/editor hangs, commit absorption, colocated git/jj desync) or to replace fragile git reset/checkout/stash/rebase recovery with reversible jj operations."
 license: "(MIT AND CC-BY-SA-4.0). See LICENSE-MIT and LICENSE-CC-BY-SA-4.0"
-compatibility: "Verified against jj 0.42.0 and 0.43.0. Re-check flags with `jj <cmd> --help` on other versions."
+compatibility: "Verified against jj 0.42.0, 0.43.0, and 0.46.0. Re-check flags with `jj <cmd> --help` on other versions."
 metadata:
   author: Netresearch DTT GmbH
   version: "1.0.0"
@@ -20,7 +20,7 @@ metadata:
 Run `${CLAUDE_SKILL_DIR}/scripts/detect_jj_state.sh`, or check manually:
 
 - `.jj/` present → jj repo: use `jj`, never **mutating** raw `git`.
-- `.jj/` **and** `.git/` → colocated: mutate with `jj`, read with git, never touch the git index/staging.
+- `.jj/` **and** `.git` (a directory, or a file in a jj 0.46+ workspace) → colocated: mutate with `jj`, read with git, never touch the git index/staging.
 - only `.git/` → plain Git repo: do not introduce `jj` unless asked.
 - in a git worktree, `jj root` ≠ `git rev-parse --show-toplevel` → **shadowed** (exit 3): jj answers for the parent repo. Run no `jj`; use git, then ask.
 
