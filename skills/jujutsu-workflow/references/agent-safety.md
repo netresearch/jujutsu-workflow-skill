@@ -61,6 +61,24 @@ Between jj commands, edits live only on disk. Practical consequences:
 - After editing files, run a jj command (`jj status`) to capture them before you
   rely on the operation log as a safety net.
 - For real safety, wire hooks that snapshot on session boundaries (next section).
+- New files over `snapshot.max-new-file-size` (default 1 MiB) are **not**
+  snapshotted; `jj status` lists them with the size limit. A generated artifact can
+  silently miss a commit. Raise the limit per command
+  (`jj --config snapshot.max-new-file-size=<bytes> status`) or ignore the file.
+
+### Immutable commits
+
+`Error: Commit <id> is immutable` means the target is in `immutable_heads()`
+(by default trunk, tags, and untracked remote bookmarks you didn't author;
+`jj config get 'revset-aliases."immutable_heads()"'` shows the repo's set). Build
+new changes on top instead. `--ignore-immutable` is only for commits you own that no
+one else has built on; never use it to rewrite trunk.
+
+### Keep WIP from being pushed
+
+Set `git.private-commits`, for example `jj config set --repo git.private-commits
+'description(glob:"wip:*")'`. `jj git push` then refuses those commits and
+anything built on them: `Won't push commit <id> since it is private`.
 
 ## 4. Hook recipe (make the safety net real)
 

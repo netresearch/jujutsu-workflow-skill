@@ -287,6 +287,51 @@ claim "jj workspace add" "jj workspace add FAILED" jj workspace add "$T/ws2"
 claim "jj workspace list" "jj workspace list FAILED" jj --no-pager workspace list
 claim "jj workspace forget" "jj workspace forget FAILED" jj workspace forget ws2
 
+# ---------- non-interactive extras (command-map.md, recovery-playbook.md, agent-safety.md) ----------
+# A separate repo so these rewrites never disturb the probe repo above.
+X="$T/extras"
+jj git init "$X" >/dev/null 2>&1
+cd "$X" || exit 2
+echo a >a
+jj commit -m one >/dev/null 2>&1
+echo b >>a
+jj commit -m two >/dev/null 2>&1
+claim "jj help -k revsets prints the revset reference" "jj help -k revsets FAILED" jj help -k revsets
+claim "change_id(<prefix>) resolves a change" "change_id() revset FAILED" \
+  jj --no-pager log --no-graph -r "change_id($(jj --no-pager log --no-graph -r @-- -T 'change_id.short(8)'))"
+claim "jj diff --from/--to compares two revisions" "jj diff --from/--to FAILED" jj --no-pager diff --from @-- --to @-
+printf 'two\n\nbody\n' >"$T/msg.txt"
+jj describe -r @- --stdin <"$T/msg.txt" >/dev/null 2>&1
+claim_bool "jj describe --stdin sets a multi-line description" "jj describe --stdin FAILED" \
+  "$([[ "$(jj --no-pager log --no-graph -r @- -T description)" == $'two\n\nbody' ]] && echo true || echo false)"
+before="$(jj --no-pager log --no-graph -r @ -T change_id)"
+jj new --no-edit -A @-- -m inserted >/dev/null 2>&1
+claim_bool "jj new --no-edit -A inserts a change without moving @" "jj new --no-edit -A moved @ or failed" \
+  "$([[ "$(jj --no-pager log --no-graph -r @ -T change_id)" == "$before" && -n "$(jj --no-pager log --no-graph -r 'description(exact:"inserted\n")' -T change_id)" ]] && echo true || echo false)"
+claim "jj revert -r R -B @ creates the inverse change" "jj revert -r R -B @ FAILED" jj revert -r @- -B @
+claim_bool "jj backout is gone (use jj revert)" "jj backout exists again" "$(yn test -n "$(jj backout --help 2>&1 >/dev/null)")"
+claim "jj evolog -p shows a change's prior versions" "jj evolog -p FAILED" jj --no-pager evolog -r @- -p
+claim "jj op log template self.id() records a restore point" "op log -T 'self.id()' FAILED" \
+  jj --no-pager op log -n1 --no-graph -T 'self.id().short(12)'
+claim "jj resolve --tool :ours is built in" "jj resolve :ours missing" hasflag resolve -- ':ours'
+claim "jj bisect run --range exists" "jj bisect run --range missing" hasflag bisect run -- --range
+claim "working_copies() revset parses" "working_copies() revset FAILED" jj --no-pager log --no-graph -r 'working_copies()'
+jj describe -m '[todo] x' >/dev/null 2>&1
+claim_bool "glob:[...] is a character class (substring: matches literally)" "glob:[todo]* now matches literally" \
+  "$([[ -z "$(jj --no-pager log --no-graph -r 'description(glob:"[todo]*") & description(substring:"[todo]")' -T change_id)" && -n "$(jj --no-pager log --no-graph -r 'description(substring:"[todo]")' -T change_id)" ]] && echo true || echo false)"
+claim_bool "snapshot.max-new-file-size defaults to 1MiB" "snapshot.max-new-file-size default changed" \
+  "$([[ "$(jj config get snapshot.max-new-file-size 2>/dev/null)" == 1MiB ]] && echo true || echo false)"
+git init -q --bare "$T/extras-origin.git"
+jj git remote add origin "$T/extras-origin.git" >/dev/null 2>&1
+jj new -m "wip: private" >/dev/null 2>&1
+echo w >w
+jj bookmark create wip-probe -r @ >/dev/null 2>&1
+priv="$(jj --config "git.private-commits=description(glob:\"wip:*\")" git push --bookmark wip-probe 2>&1)"
+claim_bool "git.private-commits blocks pushing matching commits" "git.private-commits no longer blocks the push" \
+  "$(grep -q "since it is private" <<<"$priv" && echo true || echo false)"
+claim "jj git push --deleted exists" "jj git push --deleted missing" hasflag git push -- --deleted
+claim "jj restore --from/--into exists" "jj restore --into missing" hasflag restore -- --into
+
 echo "=================================================="
 echo "verify_jj_version: $ok claims hold, $drift drifted"
 [[ "$drift" -eq 0 ]]

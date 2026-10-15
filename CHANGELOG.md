@@ -13,6 +13,15 @@ was introduced in 0.3.1; the GitHub Releases for those tags remain the original 
 
 ## [Unreleased]
 
+### Added
+
+- Command map: non-interactive `jj new --no-edit -A/-B`, `jj describe --stdin`, `jj revert` (replaces `jj backout`), `jj diff --from/--to`, `jj resolve --tool :ours`, `jj bisect run`, `jj evolog -p`, and `jj help -k` for syntax lookup
+- Revsets for `change_id()`, the mutable stack, and `working_copies()`, plus the shell-quoting and `glob:` character-class gotchas
+- Recovery: record the op ID before a risky rewrite, and recover one change with `evolog` + `restore --into` instead of a repo-wide `op restore`
+- Safety: immutable commits, `git.private-commits`, and `snapshot.max-new-file-size`
+- PR handoff: `jj git push --deleted` and the stacked-PR retarget-before-delete order
+- `verify_jj_version.sh` claims for each new command
+
 ## [1.0.0] - 2026-09-23
 
 ### Changed

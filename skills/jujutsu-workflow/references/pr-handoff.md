@@ -138,7 +138,12 @@ the project allows it, and **disclose it** in your final report.
   at `@`.
 - A bookmark does not auto-advance — `jj bookmark move <name> --to @-` before
   re-pushing, or the PR won't update.
-- After merge: `jj bookmark delete <name>` and `jj git fetch` to clean up.
+- After merge: `jj bookmark delete <name>` and `jj git fetch` to clean up;
+  `jj git push --deleted` removes deleted bookmarks from the remote.
+- **Stacked PRs:** retarget the PR above onto the new base *before* deleting the
+  merged branch below it, or GitHub closes the upper PR instead of retargeting it.
+  List the stack's bookmarks bottom to top with
+  `jj --no-pager log -r 'roots(mutable() & ::@)::@ & bookmarks()'`.
 
 ## Final verification gate
 

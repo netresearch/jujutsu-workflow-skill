@@ -73,6 +73,10 @@ copy produces a **divergent change** (`change_id??`, two commits for one change)
 Each workspace should work on its own changes; recover divergence per
 [recovery-playbook.md](recovery-playbook.md).
 
+To see what every agent is on without leaving your workspace, use
+`jj --no-pager log -r 'working_copies()'`; `<name>@` names one workspace's `@`
+(for example `jj --no-pager diff -r 'agent-2@'`).
+
 ## When parallelism isn't worth it
 
 If subagents would touch the same files, workspaces don't remove the logical

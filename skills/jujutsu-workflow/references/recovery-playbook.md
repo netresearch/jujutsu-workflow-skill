@@ -23,6 +23,9 @@ jj op restore <op-id>    # reset the WHOLE repo to the state after <op-id>
 jj op revert <op-id>     # create a new op that reverses a specific past op
 ```
 
+- Before a risky multi-step rewrite, record the current op ID:
+  `jj --no-pager op log -n1 --no-graph -T 'self.id().short(12)'`. That ID is the
+  exact restore point if any step goes wrong.
 - `jj undo` is the common case (undo a bad squash/rebase/abandon/describe).
 - `jj op restore <op-id>` is the "time machine" — copy an op ID from `jj op log`
   and the repo returns to exactly that state (bookmarks, working copy, everything).
@@ -31,6 +34,17 @@ jj op revert <op-id>     # create a new op that reverses a specific past op
   re-push) over undoing a push.
 
 Always state in your final report which recovery command you ran and why.
+
+### Recover one change, not the whole repo
+
+`jj op restore` rewinds every bookmark and every workspace's working copy. When
+only one change went wrong, or other agents share the repo, recover that change
+from its own history instead:
+
+```bash
+jj --no-pager evolog -r <change> -p      # each prior version of the change, with diffs
+jj restore --from <old-commit> --into <change> [paths]
+```
 
 ## Conflicts are first-class — they do not block you
 
