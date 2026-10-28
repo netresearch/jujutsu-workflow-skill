@@ -43,6 +43,11 @@ jj workspace add ../agent-b        # agent B works here, isolated working copy
 jj workspace list
 ```
 
+On jj 0.46+ in a colocated repo this needs Git 2.42 or newer, the minimum jj
+0.46 supports. With older Git, `--no-colocate` works around it without
+support; upgrade Git where you can (see
+[git-interop.md](git-interop.md#worktrees--workspaces)).
+
 Each workspace has its own `@` but shares the operation log and store, so results
 integrate cleanly and every workspace's history is visible. Never point two agents
 at the same working directory.
@@ -50,7 +55,8 @@ at the same working directory.
 Cleanup (order matters):
 
 ```bash
-jj workspace forget <name>     # tell jj first
+(cd ../agent-a && jj --no-pager status)  # snapshot its last edits; forget does not
+jj workspace forget <name>     # tell jj first (jj 0.46+ also removes its Git worktree)
 rm -rf ../agent-a              # then remove the directory
 ```
 
