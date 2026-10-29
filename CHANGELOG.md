@@ -13,6 +13,8 @@ was introduced in 0.3.1; the GitHub Releases for those tags remain the original 
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-29
+
 ### Added
 
 - Command map: non-interactive `jj new --no-edit -A/-B`, `jj describe --stdin`, `jj revert` (replaces `jj backout`), `jj diff --from/--to`, `jj resolve --tool :ours`, `jj bisect run`, `jj evolog -p`, and `jj help -k` for syntax lookup
@@ -175,7 +177,8 @@ what makes the state destructive rather than merely confusing.
 - Netresearch governance ruleset: security and PR-quality workflows,
   `ARCHITECTURE.md`, split MIT + CC-BY-SA-4.0 licensing.
 
-[Unreleased]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v0.3.4...v1.0.0
 [0.3.4]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v0.3.3...v0.3.4
