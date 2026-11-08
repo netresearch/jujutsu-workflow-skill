@@ -155,9 +155,12 @@ worktree`. This is common in bare-repo + worktree layouts. Two options:
   Git untouched, but the next `jj git export` rewrote `refs/heads/main` for
   every worktree of the backing repo, and detached `HEAD` in the backing repo
   and in the worktree that had `main` checked out. Hand off through a fresh
-  bookmark instead (`jj bookmark create <name> -r @`, then
+  bookmark instead (`jj bookmark create <name> -r @-`, then
   `jj git push --bookmark <name>`); exporting it adds a branch and leaves
-  `main` and every worktree's `HEAD` as they were.
+  `main` and every worktree's `HEAD` as they were, unless a `jj git fetch`
+  has moved `main` since the last export (`jj bookmark list` then shows
+  `@git (behind …)` under it). Reset it first:
+  `jj bookmark set main -r main@git --allow-backwards`.
 
 After either path, jj has **no user identity by default**; set one (commits are
 otherwise un-pushable), and keep `.jj/` out of git:
