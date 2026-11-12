@@ -13,6 +13,8 @@ was introduced in 0.3.1; the GitHub Releases for those tags remain the original 
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-11-12
+
 ### Added
 
 - git-interop: in a jj repo backed by the bare repo of git worktrees, do not move `main` or any branch a worktree uses; observed on jj 0.47, the next `jj git export` rewrites `refs/heads/main` for every worktree and detaches `HEAD` in the backing repo and in the worktree that has `main` checked out. Hand off through a new bookmark (`jj bookmark create <name> -r @-`, then `jj git push --bookmark <name>`), and after a `jj git fetch` has moved `main`, reset it with `jj bookmark set main -r main@git --allow-backwards` before exporting
@@ -181,7 +183,8 @@ what makes the state destructive rather than merely confusing.
 - Netresearch governance ruleset: security and PR-quality workflows,
   `ARCHITECTURE.md`, split MIT + CC-BY-SA-4.0 licensing.
 
-[Unreleased]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/netresearch/jujutsu-workflow-skill/compare/v0.3.4...v1.0.0
