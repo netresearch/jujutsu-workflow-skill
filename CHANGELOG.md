@@ -13,6 +13,10 @@ was introduced in 0.3.1; the GitHub Releases for those tags remain the original 
 
 ## [Unreleased]
 
+### Added
+
+- git-interop: in a jj repo backed by the bare repo of git worktrees, do not move `main` or any branch a worktree uses; observed on jj 0.47, the next `jj git export` rewrites `refs/heads/main` for every worktree and detaches `HEAD` in the backing repo and in the worktree that has `main` checked out. Hand off through a new bookmark (`jj bookmark create <name> -r @-`, then `jj git push --bookmark <name>`), and after a `jj git fetch` has moved `main`, reset it with `jj bookmark set main -r main@git --allow-backwards` before exporting
+
 ## [1.1.0] - 2026-10-29
 
 ### Added
